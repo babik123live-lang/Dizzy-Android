@@ -1,10 +1,10 @@
 {
   "source_rom_sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
   "table": {
-    "prg_start": 259428,
+    "prg_start": 259408,
     "prg_end_exclusive": 260048,
     "record_size": 10,
-    "record_count": 62
+    "record_count": 64
   },
   "recovered_record_45_hex": "31f0003c488c1305ad00",
   "field_profiles": [
@@ -200,5 +200,28 @@
       "raw5 is always 0x80..0xAA and raw8 always 0xAC..0xBD.",
       "The bytes immediately before the table include two identical 10-byte sequences, so the exact table start remains a semantic question despite the chosen 62-record span."
     ]
-  }
+  },
+  "corrected_start_analysis": {
+    "preceding_code": [
+      "259350: A2 00      LDX #$00",
+      "259352: BD FB 03   LDA $03FB,X",
+      "259355: C5 93      CMP $93",
+      "259359: BD 36 04   LDA $0436,X",
+      "259371: BC 71 04   LDY $0471,X",
+      "259374: BD AC 04   LDA $04AC,X",
+      "259392: 9D 31 05   STA $0531,X",
+      "259397: E8         INX",
+      "259398: E4 C8      CPX $C8",
+      "259400: D0 CE      BNE $F55C",
+      "259402: A9 00      LDA #$00",
+      "259404: 8D 0A C0   STA $C00A",
+      "259407: 60         RTS"
+    ],
+    "first_record_offset": 259408,
+    "first_two_records_identical_hex": "ff32002804800045ad00",
+    "conclusion": "Executable routine ends with RTS at PRG 259407. The immediately following bytes at 259408 and 259418 are two valid 10-byte records. The previous 259428 start omitted them. Correct contiguous span is 64 records from 259408 through 260047."
+  },
+  "corrections": [
+    "Previous 62-record start at 259428 was too late by 20 bytes. Correct structural span is 64 records starting at 259408."
+  ]
 }
