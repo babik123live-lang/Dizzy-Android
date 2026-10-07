@@ -5,6 +5,9 @@ import com.dizzy.remake.core.OriginalObjectCatalog
 fun main() {
     val all = OriginalObjectCatalog.all
     check(com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 10)
+    check(OriginalObjectCatalog.RECORD_COUNT == 62)
+    check(OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 259428)
+    check(OriginalObjectCatalog.TABLE_END_EXCLUSIVE_PRG_OFFSET == 260048)
     check(all.size == 62)
     check(all[45].raw0 == 49 && all[45].raw1 == 240 && all[45].raw3 == 60)
     check(all[46].raw0 == 5 && all[46].raw1 == 148)
