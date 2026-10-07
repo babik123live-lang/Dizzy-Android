@@ -905,5 +905,30 @@
       "then map placement dataset into native HD scene data"
     ],
     "guardrail": "Do not infer visual identity from tile numbers alone."
+  },
+  "chr_ram_trace_plan_and_constraints": {
+    "mapper": "iNES CHR size is zero, so tiles 0x4F..0x52 must be populated into CHR-RAM by game code/data at runtime.",
+    "byte_ranges": {
+      "tile_4f": "CHR $04F0-$04FF",
+      "tile_50": "CHR $0500-$050F",
+      "tile_51": "CHR $0510-$051F",
+      "tile_52": "CHR $0520-$052F"
+    },
+    "required_proof": [
+      "locate PPU $2006 address setup covering $04F0-$052F",
+      "locate subsequent $2007 writes or DMA-like upload loop",
+      "trace source ROM/RAM buffer for the 64 pattern bytes",
+      "decode four 2bpp 8x8 patterns only after source bytes are proven"
+    ],
+    "significance": "The visual identity of the 210 placements can be recovered exactly from runtime CHR upload provenance; no visual guessing is necessary."
+  },
+  "native_remaster_gate": {
+    "before_scene_replacement": [
+      "identify tile 0x4F..0x52 pixels",
+      "identify palette/attribute used by D87F path",
+      "confirm whether adjacent OAM writes form a metasprite",
+      "retain original 210 placement coordinates and runtime enable bits"
+    ],
+    "rule": "Do not replace placeholder native geometry with inferred graphics until these source assets are proven."
   }
 }
