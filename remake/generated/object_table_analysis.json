@@ -1006,5 +1006,25 @@
     ],
     "consequence": "The previous $04F0-$052F target range was wrong by $1000. The animated OAM tiles live in pattern table 1.",
     "next": "Trace the $DE84 call that receives tile IDs 4F-52 and recover its X/Y source pointer; then decode the exact 64 source bytes."
-  }
+  },
+  "de84_decoder": {
+    "exact_register_contract": "A selects destination tile/address; X/Y are source pointer; RAM $32 is outer block count.",
+    "header": "At each outer block, source[0] is split: low nibble -> $34; high nibble + 1 -> $35.",
+    "stream": "Source pointer is advanced before reading payload bytes. Payload bytes are written to $2007. $35 counts down on payload writes; when it reaches zero, the current byte can be emitted repeatedly under $34. X starts at 16 and controls the block's output progression; source pointer and $32 advance/control subsequent blocks.",
+    "destination": "A is shifted left four times with carry accumulated into $33, then $33 and shifted A are written to $2006.",
+    "correction": "DE84 is not a raw 16-byte tile copier. It is a compact CHR stream decoder/uploader with nibble-coded run behavior.",
+    "implication": "Recovering tiles 4F-52 requires decoding the source stream, not copying 64 contiguous ROM bytes."
+  },
+  "de84_call_sites": [
+    "C706",
+    "DE0A",
+    "DE5F",
+    "DE78"
+  ],
+  "next_chr_work": [
+    "resolve X/Y source pointer and A/$32 at each reachable DE84 call",
+    "implement DE84 byte-for-byte decoder in rom_extract.py",
+    "simulate writes and select those landing at 14F0-152F",
+    "emit decoded 2bpp pixels for tiles 4F-52"
+  ]
 }
