@@ -14,6 +14,7 @@ data class OriginalObject(
     companion object {
         const val BYTE_SIZE = 10
         fun decode(b:ByteArray, o:Int):OriginalObject {
+            require(o >= 0 && o + BYTE_SIZE <= b.size) { "10-byte ROM record exceeds source bounds" }
             fun u(i:Int)=b[o+i].toInt() and 0xff
             return OriginalObject(
                 u(0), u(1), u(2), u(3),
