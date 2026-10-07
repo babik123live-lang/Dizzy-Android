@@ -279,4 +279,73 @@ def main():
     }
     (out/"tile_4f_52_evidence.json").write_text(
         json.dumps(evidence,indent=2),encoding="utf-8")
+
+    # The animated $4F-$52 placements are the collectible stars.
+    # Main path: 210 grouped horizontal placements. Three additional paths
+    # contribute 10 + 20 + 10 placements, giving the exact 250-star counter.
+    def bank_byte(bank,cpu):
+        if bank==15:
+            if not 0xC000 <= cpu <= 0xFFFF: raise ValueError(hex(cpu))
+            po=fixed_base+(cpu-0xC000)
+        else:
+            if not 0x8000 <= cpu <= 0xBFFF: raise ValueError((bank,hex(cpu)))
+            po=bank*0x4000+(cpu-0x8000)
+        return prg[po]
+
+    stars=[]
+    for i in range(210):
+        key=bank_byte(13,0xB312+i)
+        world=bank_byte(13,0xB3E5+i) | (bank_byte(13,0xB4B8+i)<<8)
+        fixed=bank_byte(13,0xB58B+i)
+        stars.append({
+            "id":i,
+            "layout":"horizontal",
+            "group_raw":key,
+            "world_axis":world,
+            "fixed_axis":fixed,
+            "state_bit":i,
+        })
+    if bank_byte(13,0xB312+210) != 0xFF:
+        raise SystemExit("210-entry star table terminator changed")
+
+    supplemental=[
+        (10,0x8F43,10,210,"vertical_a"),
+        (13,0x8CFE,20,220,"vertical_b"),
+        (14,0x9260,10,240,"vertical_c"),
+    ]
+    for bank,cpu,count,start_id,label in supplemental:
+        for n in range(count):
+            p=cpu+3*n
+            world=bank_byte(bank,p) | (bank_byte(bank,p+1)<<8)
+            fixed=bank_byte(bank,p+2)
+            stars.append({
+                "id":start_id+n,
+                "layout":label,
+                "world_axis":world,
+                "fixed_axis":fixed,
+                "state_bit":start_id+n,
+            })
+
+    if len(stars)!=250 or [s["id"] for s in stars] != list(range(250)):
+        raise SystemExit("star placement coverage is not exactly 0..249")
+    state_map=[bank_byte(15,0xC200+i) for i in range(250)]
+    if not all(state_map[i]==i//8 for i in range(250)):
+        raise SystemExit("packed star-state map changed")
+    counter_init=bytes(bank_byte(15,a) for a in range(0xF8E1,0xF8E6))
+    if counter_init != bytes((0xA9,0xFA,0x8D,0x72,0x07)):
+        raise SystemExit("250-star counter initialization changed")
+
+    star_manifest={
+        "total":250,
+        "counter_ram":"0x0772",
+        "counter_initial":250,
+        "packed_state_ram":"0x0751-0x0770",
+        "main_count":210,
+        "supplemental_counts":[10,20,10],
+        "animation_tiles":[0x4F,0x50,0x51,0x52,0x51,0x50,0x4F],
+        "graphics_resource_id":23,
+        "placements":stars,
+    }
+    (out/"star_manifest.json").write_text(
+        json.dumps(star_manifest,indent=2),encoding="utf-8")
 if __name__=="__main__": main()
