@@ -750,5 +750,15 @@
     },
     "next_run_offset": 259888,
     "conclusion": "The 10-byte gap is structurally another record. It was excluded only because the scanner capped area_id at 48. Therefore the apparent 45+16 split is an artifact of the heuristic; offsets 259428..260047 form 62 consecutive 10-byte records."
+  },
+  "table_boundary_analysis": {
+    "table_start_prg_offset": 259428,
+    "record_size": 10,
+    "record_count": 62,
+    "last_record_prg_offset": 260038,
+    "first_byte_after_table_offset": 260048,
+    "bytes_after_table_hex": "ffc5a3f009b02a18691ac5a39024a52038e909a8",
+    "boundary_evidence": "Byte 0xFF occurs immediately after 62 consecutive 10-byte records. Following bytes decode plausibly as 6502 code, providing a strong structural boundary for the table.",
+    "status": "62-record boundary strongly supported"
   }
 }
