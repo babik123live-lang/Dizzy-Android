@@ -7,6 +7,9 @@ package com.dizzy.remake.core
  * until the original loader code proves their semantics.
  */
 object OriginalObjectCatalog {
+    const val RECORD_COUNT = 62
+    const val TABLE_START_PRG_OFFSET = 259428
+    const val TABLE_END_EXCLUSIVE_PRG_OFFSET = TABLE_START_PRG_OFFSET + RECORD_COUNT * OriginalObject.BYTE_SIZE
     private val rows = arrayOf(
         intArrayOf(17,102,5,120,43525,31,45468,0),
         intArrayOf(5,78,2,240,35279,14,45521,0),
