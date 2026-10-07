@@ -1269,5 +1269,20 @@
   "room_catalog_alignment": {
     "count": 50,
     "result": "Polish short labels realigned to runtime location keys 0..49; legacy 49-entry ordering removed."
-  }
+  },
+  "map_render_breakthrough": {
+    "metatile_bytes": 17,
+    "tiles": "bytes 0..15 are a 4x4 matrix of 8x8 tile IDs; C96C selects one column with offsets 0,4,8,12",
+    "attribute": "byte 16 is written directly as one NES attribute-table byte for the same 32x32 cell",
+    "palette_quadrants": "2-bit selectors: TL bits0-1, TR bits2-3, BL bits4-5, BR bits6-7",
+    "ppu_stream": "C903/C96C build page-$0100 commands; DAD5-DB31 writes them through $2006/$2007",
+    "vertical_strip": "six map rows x four tile IDs = 24 tiles, followed by tile $DF",
+    "nametables": "tile columns target $20xx/$24xx; attributes target $23C0..$23C7 or $27C0..$27C7",
+    "code": [
+      "OriginalMetatile.kt",
+      "OriginalMapRenderContract.kt",
+      "OriginalMapStripComposer.kt"
+    ]
+  },
+  "text_identity_caution": "RoomCatalog names are UI labels only. ROM runtime identity remains keyed by OriginalLocationCatalog because some text pointers are conditionally reused/adjusted."
 }
