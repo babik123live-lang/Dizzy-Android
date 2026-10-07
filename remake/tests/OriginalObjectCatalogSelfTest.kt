@@ -1,9 +1,15 @@
 package com.dizzy.remake.tests
 
 import com.dizzy.remake.core.OriginalObjectCatalog
+import com.dizzy.remake.core.OriginalObject
 
 fun main() {
     val all = OriginalObjectCatalog.all
+    val sample = byteArrayOf(0x31,0xF0.toByte(),0x00,0x3C,0x48,0x8C.toByte(),0x13,0x05,0xAD.toByte(),0x00)
+    val decoded = OriginalObject.decode(sample, 0)
+    check(decoded == OriginalObject(49,240,0,60,35912,19,44293,0))
+    val padded = byteArrayOf(0x55) + sample + byteArrayOf(0x66)
+    check(OriginalObject.decode(padded, 1) == decoded)
     check(com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 10)
     check(OriginalObjectCatalog.RECORD_COUNT == 64)
     check(OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 259408)
