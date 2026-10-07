@@ -1,6 +1,74 @@
 #!/usr/bin/env python3
 import argparse, hashlib, json, pathlib, re
 
+
+def decode_de84_stream(prg, bank, src_cpu, count):
+    """Decode the game's $DE84 compressed CHR stream into 16-byte NES tiles."""
+    if not (0 <= bank < len(prg)//0x4000):
+        raise ValueError("bank out of range")
+    if not (0x8000 <= src_cpu <= 0xBFFF):
+        raise ValueError("source CPU address out of switchable-bank range")
+    bank_data=prg[bank*0x4000:(bank+1)*0x4000]
+    p=src_cpu-0x8000
+    tiles=[]
+    trace=[]
+    for block in range(count):
+        block_start=p
+        header=bank_data[p]; p+=1
+        repeat=header & 0x0F
+        literal_count=(header >> 4) + 1
+        remaining=16
+        out_bytes=[]
+        last=None
+        for _ in range(literal_count):
+            if remaining == 0: break
+            last=bank_data[p]; p+=1
+            out_bytes.append(last); remaining-=1
+        if remaining and last is not None:
+            extra=remaining if repeat == 0 else min(repeat,remaining)
+            out_bytes.extend([last]*extra); remaining-=extra
+        while remaining:
+            last=bank_data[p]; p+=1
+            out_bytes.append(last); remaining-=1
+        if len(out_bytes) != 16:
+            raise AssertionError("DE84 block did not decode to 16 bytes")
+        tiles.append(bytes(out_bytes))
+        trace.append({
+            "block":block,
+            "source_cpu_start":0x8000+block_start,
+            "source_cpu_end_exclusive":0x8000+p,
+            "header":header,
+            "literal_count":literal_count,
+            "repeat_nibble":repeat
+        })
+    return tiles,trace,0x8000+p
+
+def decode_nes_2bpp(tile):
+    if len(tile) != 16: raise ValueError("NES tile must be 16 bytes")
+    rows=[]
+    for y in range(8):
+        p0,p1=tile[y],tile[y+8]
+        rows.append([((p0>>bit)&1) | (((p1>>bit)&1)<<1) for bit in range(7,-1,-1)])
+    return rows
+
+def extract_chr_resource_table(prg):
+    # $DD55-$DDE0 in the fixed bank: 28 five-byte descriptors consumed by $DDE1.
+    start=15*0x4000+(0xDD55-0xC000)
+    raw=prg[start:start+28*5]
+    rows=[]
+    for i in range(28):
+        lo,hi,dest,count,flags=raw[i*5:(i+1)*5]
+        rows.append({
+            "index":i,
+            "source_bank":flags & 0x0F,
+            "pattern_table":1 if flags & 0x80 else 0,
+            "source_cpu":lo | (hi<<8),
+            "destination_tile":dest,
+            "tile_count":count,
+            "flags_raw":flags
+        })
+    return rows
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("rom")
@@ -14,6 +82,33 @@ def main():
     out=pathlib.Path(a.out); out.mkdir(parents=True,exist_ok=True)
     meta={"sha256":hashlib.sha256(raw).hexdigest(),"size":len(raw),"prg_size":prg_size,"chr_size":chr_size,"mapper":mapper}
     (out/"rom.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
+
+    resources=extract_chr_resource_table(prg)
+    (out/"chr_resource_table.json").write_text(json.dumps(resources,indent=2),encoding="utf-8")
+    # Resource 9 is proven by $DDE1 and its call site to populate pattern table 1
+    # from tile $4D. Decode the exact frames later emitted as OAM tiles $4F-$52.
+    r9=resources[9]
+    decoded,trace,source_end=decode_de84_stream(
+        prg,r9["source_bank"],r9["source_cpu"],r9["tile_count"])
+    wanted=[]
+    for tile_no in range(0x4F,0x53):
+        idx=tile_no-r9["destination_tile"]
+        tile=decoded[idx]
+        wanted.append({
+            "tile":tile_no,
+            "raw_hex":tile.hex(),
+            "pixels_2bpp":decode_nes_2bpp(tile),
+            "decode_trace":trace[idx]
+        })
+    chr_evidence={
+        "resource_index":9,
+        "resource":r9,
+        "source_cpu_end_exclusive":source_end,
+        "tiles":wanted
+    }
+    (out/"chr_tiles_4f_52.json").write_text(
+        json.dumps(chr_evidence,indent=2),encoding="utf-8")
+
     # Tri-lingual room prose starts in the later PRG banks. Keep offsets so the
     # remake can replace strings without depending on the NES renderer.
     strings=[]
@@ -35,7 +130,7 @@ def main():
         while pos+record_size <= len(prg):
             r=prg[pos:pos+record_size]
             raw0, raw2=r[0], r[2]
-            if raw0 > 255 or raw2 > 48:
+            if raw2 > 48:
                 break
             sprite=r[4] | (r[5]<<8)
             desc=r[7] | (r[8]<<8)
