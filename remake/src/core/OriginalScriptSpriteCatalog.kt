@@ -29,7 +29,7 @@ object OriginalScriptSpriteCatalog {
         48,2,48,24, 48,3,176,24, 48,4,624,152, 48,5,880,88
     )
 
-    val all:List<OriginalScriptSpritePlacement>=(0 until raw.size/4).map { i ->
+    val all:List<OriginalScriptSpritePlacement> = (0 until raw.size/4).map { i ->
         val o=i*4
         OriginalScriptSpritePlacement(raw[o],raw[o+1],raw[o+2],raw[o+3])
     }
