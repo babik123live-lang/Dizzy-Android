@@ -73,6 +73,13 @@ def main():
                 refs.append({"prg_offset":i,"opcode":abs_ops[prg[i]],"cpu_address":f"0x{cpu_addr:04X}"})
         c["absolute_6502_refs"]=refs
         c["verified_by_code_reference"]=bool(refs)
+    # Preserve exact record bytes so generated evidence can be compared byte-for-byte
+    # against the source ROM rather than reconstructed from interpreted fields.
+    for c in filtered:
+        for r in c["records"]:
+            o=r["offset"]
+            r["raw_hex"]=prg[o:o+10].hex()
+
     # Add structural evidence without promoting candidates to verified data.
     # Addresses in fields 4/5 and 7/8 consistently land in the CPU ROM window;
     # this is useful evidence for reverse engineering, but still not semantic proof.
