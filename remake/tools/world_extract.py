@@ -131,11 +131,14 @@ def main():
     locations=[]; normal_edges=[]; special_dests=set(); all_transition_ptrs=set()
     for key,ptr in enumerate(ptrs):
         d=bs(prg,1,ptr,DESCRIPTOR_SIZE)
-        width=d[0]; metatile_base=w16(d,3); metatile_bank=d[9]
-        left=w16(d,5); right=w16(d,7); map_ptr=w16(d,20)
+        width=d[0]; world_origin=w16(d,1)
+        metatile_base=w16(d,3); metatile_bank=d[9]
+        left=w16(d,5); right=w16(d,7)
+        collision_mask=w16(d,10); palette_data=w16(d,12)
         chr_upload_list=w16(d,14)
         text_stream=w16(d,16)
         routine_list=w16(d,18)
+        map_ptr=w16(d,20)
         chr_uploads,chr_marker_count=parse_chr_upload_list(prg,chr_upload_list)
         text_en=read_text_stream_en(prg,text_stream)
         assert 1<=width<=96
@@ -144,7 +147,11 @@ def main():
         assert 0xC000<=left<=0xFFFF and 0xC000<=right<=0xFFFF
         assert 0x8000<=map_ptr<=0xBFFF
         grid=list(bs(prg,2,map_ptr,width*6))
+        collision_bytes=bs(prg,1,collision_mask,26)
+        palette_bytes=bs(prg,1,palette_data,42)
         assert len(grid)==width*6
+        assert len(collision_bytes)==26
+        assert len(palette_bytes)==42 and max(palette_bytes)<=0x3F
         used=sorted(set(grid))
         assert metatile_base + max(used)*17 + 16 <= 0xBFFF
         metatiles={}
@@ -174,10 +181,14 @@ def main():
         all_transition_ptrs|={left,right}
         locations.append({
             'key':key,'descriptor_cpu':ptr,'width_columns_32px':width,
-            'world_origin_raw':w16(d,1),
+            'world_origin_raw':world_origin,
             'metatile_base_cpu':metatile_base,'metatile_bank':metatile_bank,
             'left_transition_cpu':left,'right_transition_cpu':right,
-            'raw10_11':w16(d,10),'raw12_13':w16(d,12),
+            'collision_mask_cpu':collision_mask,
+            'collision_mask_208_bits_hex':collision_bytes.hex(),
+            'palette_data_cpu':palette_data,
+            'palette_initial_three':list(palette_bytes[:3]),
+            'palette_frames_13':[list(palette_bytes[3+i*13:3+(i+1)*13]) for i in range(3)],
             'chr_upload_list_cpu':chr_upload_list,
             'chr_upload_marker_count':chr_marker_count,
             'chr_uploads':chr_uploads,
@@ -201,6 +212,9 @@ def main():
     assert all(x['map_rows']==6 and x['map_cell_count']==x['width_columns_32px']*6 for x in locations)
     assert all(x['map_stream_bank']==2 for x in locations)
     assert set(x['metatile_bank'] for x in locations)=={3,4,5,9}
+    assert len(set(x['collision_mask_cpu'] for x in locations))==12
+    assert len(set(x['palette_data_cpu'] for x in locations))==19
+    assert all(max(t for m in x['metatiles'].values() for row in m['tiles_4x4'] for t in row)<=207 for x in locations)
     assert all(0x8000<=x['chr_upload_list_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['text_stream_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['routine_list_cpu']<=0xBFFF for x in locations)
