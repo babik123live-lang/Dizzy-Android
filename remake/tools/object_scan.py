@@ -1,32 +1,22 @@
 #!/usr/bin/env python3
-"""Decode known 10-byte FAoD persistent-object records from a supplied NES ROM."""
+"""Search the supplied ROM for externally documented 10-byte object signatures.
+Never assumes offsets from another ROM revision."""
 import argparse,json,pathlib
 from ines import parse
-
-# Verified anchors documented against the European NES build.
-KNOWN={
-  "star_plant":0x03F736,
-  "plank":0x03F952,
+SIGS={
+ "star_plant":bytes.fromhex("0F 2F 08 9E 63 8B 02 C8 82 03"),
+ "plank":bytes.fromhex("0E F4 01 A8 5E A5 1D F4 83 00"),
 }
-def file_to_prg(file_offset:int)->int:
-    return file_offset-16
-
-def decode(prg,o):
-    b=prg[o:o+10]
-    return {
-      "area_id":b[0],"x":b[1],"sub_area_id":b[2],"y":b[3],
-      "sprite_address":b[4]|b[5]<<8,
-      "interaction_id":b[6],
-      "description_address":b[7]|b[8]<<8,
-      "interaction_sub_id":b[9],
-      "raw":" ".join(f"{x:02X}" for x in b)
-    }
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument("rom");ap.add_argument("-o","--out",default="remake/generated/known_objects.json");a=ap.parse_args()
-    ines=parse(pathlib.Path(a.rom).read_bytes())
-    out={}
-    for name,fo in KNOWN.items():
-        po=file_to_prg(fo)
-        out[name]={"file_offset":fo,"prg_offset":po,**decode(ines.prg,po)}
-    p=pathlib.Path(a.out);p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(out,indent=2),encoding="utf-8")
+ ap=argparse.ArgumentParser();ap.add_argument("rom");ap.add_argument("-o","--out",default="remake/generated/object_signature_search.json");a=ap.parse_args()
+ prg=parse(pathlib.Path(a.rom).read_bytes()).prg; result={}
+ for name,sig in SIGS.items():
+  hits=[]; p=0
+  while True:
+   p=prg.find(sig,p)
+   if p<0: break
+   hits.append(p);p+=1
+  result[name]={"signature":sig.hex(" ").upper(),"prg_offsets":hits}
+ pathlib.Path(a.out).write_text(json.dumps(result,indent=2),encoding="utf-8")
+ print(result)
 if __name__=="__main__":main()
