@@ -4,6 +4,7 @@ import com.dizzy.remake.core.OriginalObjectCatalog
 
 fun main() {
     val all = OriginalObjectCatalog.all
+    check(com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 10)
     check(all.size == 62)
     check(all[45].raw0 == 49 && all[45].raw1 == 240 && all[45].raw3 == 60)
     check(all[46].raw0 == 5 && all[46].raw1 == 148)
