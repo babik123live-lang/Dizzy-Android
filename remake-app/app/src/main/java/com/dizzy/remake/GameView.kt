@@ -373,11 +373,28 @@ class GameView(context: Context) : View(context) {
     }
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
-        val down=e.actionMasked!=MotionEvent.ACTION_UP&&e.actionMasked!=MotionEvent.ACTION_CANCEL
-        if(!down){input.left=false;input.right=false;input.a=false;lastA=false;return true}
-        input.left=e.x<width*.18f; input.right=e.x>=width*.18f&&e.x<width*.36f; input.a=e.x>width*.72f
-        if(input.a && !lastA) audio.jump()
-        lastA=input.a
+        var left = false
+        var right = false
+        var action = false
+        val lifted = if (e.actionMasked == MotionEvent.ACTION_POINTER_UP) e.actionIndex else -1
+
+        if (e.actionMasked != MotionEvent.ACTION_UP && e.actionMasked != MotionEvent.ACTION_CANCEL) {
+            for (i in 0 until e.pointerCount) {
+                if (i == lifted) continue
+                val x = e.getX(i)
+                when {
+                    x < width * .18f -> left = true
+                    x < width * .36f -> right = true
+                    x > width * .72f -> action = true
+                }
+            }
+        }
+
+        input.left = left
+        input.right = right
+        input.a = action
+        if (action && !lastA) audio.jump()
+        lastA = action
         return true
     }
 }
