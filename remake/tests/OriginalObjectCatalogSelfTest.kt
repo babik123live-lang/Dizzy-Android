@@ -10,6 +10,9 @@ fun main() {
     check(decoded == OriginalObject(49,240,0,60,35912,19,44293,0))
     val padded = byteArrayOf(0x55) + sample + byteArrayOf(0x66)
     check(OriginalObject.decode(padded, 1) == decoded)
+    var shortDecodeRejected = false
+    try { OriginalObject.decode(byteArrayOf(1,2,3), 0) } catch (_: IllegalArgumentException) { shortDecodeRejected = true }
+    check(shortDecodeRejected)
     check(com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 10)
     check(OriginalObjectCatalog.RECORD_COUNT == 64)
     check(OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 259408)
