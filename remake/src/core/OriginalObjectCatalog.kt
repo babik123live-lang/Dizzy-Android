@@ -86,5 +86,5 @@ object OriginalObjectCatalog {
     }
 
     /** Provisional raw-field filter; do not use this to drive room layout yet. */
-    fun inArea(rawFirstField:Int): List<OriginalObject> = all.filter { it.raw0 == rawFirstField }
+    fun byRaw0(value:Int): List<OriginalObject> = all.filter { it.raw0 == value }
 }
