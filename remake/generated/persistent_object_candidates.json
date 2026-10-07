@@ -690,7 +690,7 @@
     "pointer_reference_prg_offsets": [
       99828
     ],
-    "status": "candidate_pointer_reference_found",
-    "note": "A unique little-endian reference to CPU address F564 was found in PRG. This strengthens the table hypothesis but does not by itself prove record semantics."
+    "status": "unverified_candidate_only",
+    "note": "Correction: the bytes around PRG offset 99828 do not establish that 64 F5 is an executable-code pointer reference. The candidate runs are retained only as scanner output until loader/disassembly evidence proves the record layout."
   }
 }
