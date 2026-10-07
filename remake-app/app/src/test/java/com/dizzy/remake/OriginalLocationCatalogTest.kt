@@ -66,5 +66,10 @@ class OriginalLocationCatalogTest {
         assertEquals(9,all[15].mainStarCount)
         assertEquals(9,all[18].mainStarCount)
         assertEquals(3,all[49].mainStarCount)
+        assertEquals(255,all[0].leftDestination(0))
+        assertEquals(122,all[0].rightDestination(0))
+        assertEquals(19,all[15].rightDestination(500))
+        assertEquals(17,all[15].rightDestination(501))
+        assertEquals(22,all[49].leftDestination(0))
     }
 }
