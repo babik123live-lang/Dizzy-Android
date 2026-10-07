@@ -6,13 +6,13 @@ package com.dizzy.remake.core
  */
 data class OriginalObject(
     val raw0:Int,
-    val x:Int,
+    val raw1:Int,
     val raw2:Int,
-    val y:Int,
-    val spriteAddress:Int,
-    val interactionId:Int,
-    val descriptionAddress:Int,
-    val interactionSubId:Int
+    val raw3:Int,
+    val raw45le:Int,
+    val raw6:Int,
+    val raw78le:Int,
+    val raw9:Int
 ) {
     companion object {
         fun decode(b:ByteArray, o:Int):OriginalObject {
