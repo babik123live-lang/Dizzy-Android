@@ -73,10 +73,23 @@ def main():
     assert bs(prg,1,0xBB44,0x10).find(bytes.fromhex('6905'))>=0
 
     scripts=[]; counts=Counter()
+    f498_placements=[]; f46f_args=[]; f492_args=[]; f4c1_ranges=[]
     for key in range(LOCATION_COUNT):
         ptr=script_ptr(prg,key)
         ops,end=parse_script(prg,ptr)
-        for op in ops: counts[op['handler_cpu']]+=1
+        for op_index,op in enumerate(ops):
+            h=op['handler_cpu']; args=op['args']; counts[h]+=1
+            if h==0xF498:
+                f498_placements.append({'location_key':key,'op_index':op_index,
+                    'world_x':args[0]|(args[1]<<8),'y':args[2]})
+            elif h==0xF46F:
+                f46f_args.append({'location_key':key,'op_index':op_index,'raw':args[0]})
+            elif h==0xF492:
+                f492_args.append({'location_key':key,'op_index':op_index,'raw':args[0]})
+            elif h==0xF4C1:
+                f4c1_ranges.append({'location_key':key,'op_index':op_index,
+                    'x_start':args[0]|(args[1]<<8),'x_end':args[2]|(args[3]<<8),
+                    'raw_parameter':args[4]})
         scripts.append({'location_key':key,'script_cpu':ptr,'op_count':len(ops),'ops':ops,'end_cpu':end})
 
     assert len(scripts)==50
@@ -93,6 +106,24 @@ def main():
     assert counts[0xBF9B]==7
     assert counts[0xF4C1]==4
     assert counts[0xF492]==3
+    assert len(f498_placements)==100
+    assert min(x['world_x'] for x in f498_placements)==24
+    assert max(x['world_x'] for x in f498_placements)==2504
+    assert min(x['y'] for x in f498_placements)==20
+    assert max(x['y'] for x in f498_placements)==152
+    assert len(f46f_args)==23 and sorted(set(x['raw'] for x in f46f_args))==[3,10,46,86,208,214]
+    assert len(f492_args)==3 and {x['raw'] for x in f492_args}=={115}
+    assert len(f4c1_ranges)==4
+    assert [(x['x_start'],x['x_end'],x['raw_parameter']) for x in f4c1_ranges]==[
+        (100,500,176),(804,928,0),(0,200,144),(0,184,176)]
+
+    # F498's three bytes are proven by F49D-F4A9 and $87EB:
+    # 16-bit world X is camera-relative, byte 3 supplies Y, and two adjacent
+    # animation tiles are emitted through D87F.
+    assert bs(prg,15,0xF49D,0x1E).startswith(bytes.fromhex('b1cb8520c8b1cb8521c8b1cb8522'))
+    assert bs(prg,0,0x87EB,0x3A).find(bytes.fromhex('a52038edbb038524aa'))>=0
+    assert bs(prg,0,0x87EB,0x3A).find(bytes.fromhex('a5221869f8a8'))>=0
+    assert bs(prg,0,0x87EB,0x3A).count(bytes.fromhex('207fd8'))==2
 
     result={
         'rom_sha256':hashlib.sha256(raw).hexdigest(),
@@ -101,6 +132,10 @@ def main():
         'unique_handlers':63,
         'known_argument_handlers':{hex(k):v for k,v in ARG_COUNTS.items()},
         'handler_counts':{hex(k):v for k,v in sorted(counts.items())},
+        'f498_two_tile_placements':f498_placements,
+        'f46f_single_args':f46f_args,
+        'f492_single_args':f492_args,
+        'f4c1_world_x_ranges':f4c1_ranges,
         'scripts':scripts,
     }
     out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
