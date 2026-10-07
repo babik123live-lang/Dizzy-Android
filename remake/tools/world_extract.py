@@ -154,7 +154,10 @@ def main():
             tiles=list(rec[:16])
             metatiles[str(cell)]={
                 'tiles_4x4':[tiles[0:4],tiles[4:8],tiles[8:12],tiles[12:16]],
-                'raw17':rec[16],
+                'attribute_byte':rec[16],
+                'palette_quadrants':[
+                    rec[16]&3,(rec[16]>>2)&3,(rec[16]>>4)&3,(rec[16]>>6)&3
+                ],
                 'raw_hex':rec.hex(),
             }
         lrows=transition_table(prg,left); rrows=transition_table(prg,right)
@@ -220,8 +223,13 @@ def main():
     assert bytes.fromhex('2070db') in bs(prg,FIXED_BANK,0xF090,0x20)
     assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('b1cb'))>=0
     assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('6c1c00'))>=0
+    assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a010b11ca414990301'))>=0
+    assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a5830980990001a5829901011869088582a901990201'))>=0
     assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a510290318651c'))>=0
     assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a000b11c9d0001a004b11c9d0101a008b11c9d0201a00cb11c9d0301'))>=0
+    assert bs(prg,FIXED_BANK,0xCA22,0x20)==bytes.fromhex('a54fa224a027c920b004a220a023291f855486554a4a1869c08556845720c2c8')
+    assert bs(prg,FIXED_BANK,0xDAD5,0x5F).find(bytes.fromhex('b90001f04fc901f01b8d0620'))>=0
+    assert bs(prg,FIXED_BANK,0xDAD5,0x5F).find(bytes.fromhex('b900018d0720'))>=0
     assert [x['key'] for x in locations]==list(range(50))
     assert locations[0]['descriptor_cpu']==0xA882
     assert locations[16]['descriptor_cpu']==0xB615
@@ -250,7 +258,16 @@ def main():
         'metatile_format':{
             'bytes_per_cell_definition':17,
             'tile_matrix':'first 16 bytes form a 4x4 8x8-tile matrix; C96C selects one column using fine X and offsets 0,4,8,12',
-            'raw17':'separate byte consumed by C96C; semantic name intentionally withheld until its PPU/runtime role is proven',
+            'attribute_byte':'byte 16 is written as one NES attribute-table byte for the same 32x32 cell',
+            'palette_quadrants':'2-bit palette selectors ordered top-left, top-right, bottom-left, bottom-right',
+        },
+        'streaming_contract':{
+            'map_rows':6,'tile_rows_per_cell':4,'tile_bytes_per_streamed_column':24,
+            'bottom_tile':223,
+            'nametable_high_bytes':[32,36],
+            'attribute_high_bytes':[35,39],
+            'attribute_low_base':192,
+            'proof':'C903/C96C build the page-$0100 PPU command list; DAD5-DB31 consumes it via $2006/$2007.'
         },
         'chr_upload_summary':{
             'entry_count':304,'single_switch_marker_locations':49,'empty_location_keys':[16],
