@@ -930,5 +930,62 @@
       "retain original 210 placement coordinates and runtime enable bits"
     ],
     "rule": "Do not replace placeholder native geometry with inferred graphics until these source assets are proven."
+  },
+  "ppu_chr_writer_scan": {
+    "method": "Direct ROM scan for absolute STA/STX/STY operands $2006/$2007; hits are candidates until CFG alignment is proven.",
+    "fixed_bank_2006": [
+      "C729",
+      "C72E",
+      "C8B3",
+      "C8B6",
+      "D402",
+      "D405",
+      "D40D",
+      "D410",
+      "D48A",
+      "D48D",
+      "D4A2",
+      "D4A5",
+      "D4B6",
+      "D4B9",
+      "DA10",
+      "DA17",
+      "DA7F",
+      "DA82",
+      "DAE6",
+      "DAED",
+      "DB0E",
+      "DB15",
+      "DE30",
+      "DE33",
+      "DEA1",
+      "DEA4",
+      "FA3B",
+      "FA40",
+      "FA50",
+      "FA55"
+    ],
+    "fixed_bank_2007": [
+      "C6B4",
+      "D408",
+      "D490",
+      "D4BC",
+      "D9DE",
+      "DA24",
+      "DAF8",
+      "DB20",
+      "DE3C",
+      "DEC4",
+      "DECE",
+      "FB04",
+      "FB16"
+    ],
+    "priority": [
+      "Trace paired address/data loops at D402-D410",
+      "Trace D48A-D4BC",
+      "Trace DE30-DE3C and DEA1-DECE",
+      "Trace FA3B-FB16"
+    ],
+    "target": "Prove which writer reaches PPU pattern addresses $04F0-$052F and identify its source bytes."
   }
 }
