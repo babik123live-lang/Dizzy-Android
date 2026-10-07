@@ -1154,5 +1154,32 @@
     "checks": 36,
     "result": "all passed against verified ROM SHA-256",
     "script": "remake/tools/star_extract.py"
+  },
+  "star_pickup_batch": {
+    "validation_count": 38,
+    "validation_result": "36 original checks plus 2 corrected assumptions now pass against the verified ROM",
+    "corrections": [
+      "Main 210-star world-axis range is 38..2828, not the earlier stale 21..3032.",
+      "RAM $93 is now proven to receive transition-table results; treat it as a location/screen-state key, not a RoomCatalog index."
+    ],
+    "pickup_windows": {
+      "main_horizontal": "dx -20..11, dy -30..-15 relative to RAM $A2/$A3",
+      "vertical_a": "dx -28..9, dy -20..19 relative to RAM $A2/$A3",
+      "vertical_b": "unsigned dx 0..19, dy 0..19 relative to RAM $84/$85",
+      "vertical_c": "dx -20..19, dy -20..19 relative to RAM $A2/$A3"
+    },
+    "gate": "Bank 0 reads $0772 at $AEFD and skips the stargate barrier when the counter is zero.",
+    "location_key_proof": "$C748 returns the third byte of a transition-table entry; callers at $83C0/$83F3 store that returned value into RAM $93. The 210-star table then matches its group key against $93.",
+    "main_table": {
+      "count": 210,
+      "key_min": 0,
+      "key_max": 49,
+      "unique_keys": 49,
+      "missing_key": 16,
+      "world_axis_min": 38,
+      "world_axis_max": 2828,
+      "fixed_axis_min": 12,
+      "fixed_axis_max": 161
+    }
   }
 }
