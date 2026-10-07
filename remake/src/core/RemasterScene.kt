@@ -121,6 +121,14 @@ object RemasterScenes {
             ScenePlatform(RectF(815f,144f,175f,12f),Material.WOOD),
             ScenePlatform(RectF(1040f,178f,130f,12f),Material.STONE)
         ))
+        15 -> scene(15,1280f,RoomCatalog.rooms[15].namePl,listOf(
+            ScenePlatform(RectF(0f,210f,1280f,30f),Material.GRASS),
+            ScenePlatform(RectF(95f,176f,175f,12f),Material.WOOD),
+            ScenePlatform(RectF(340f,144f,185f,12f),Material.WOOD),
+            ScenePlatform(RectF(595f,112f,190f,12f),Material.WOOD),
+            ScenePlatform(RectF(855f,150f,180f,12f),Material.WOOD),
+            ScenePlatform(RectF(1090f,180f,145f,12f),Material.STONE)
+        ))
         else -> error("Room $id not remastered yet")
     }
 
