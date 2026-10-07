@@ -828,5 +828,32 @@
     "B58B values are runtime metadata written to $1F.",
     "$1E is an actual downstream index/offset input, not merely a temporary subtraction byte.",
     "Do not name D87F as renderer until its body/call effects are traced."
+  ],
+  "d87f_dataflow": {
+    "entry": "$D87F with X = RAM $1E",
+    "established_inputs": [
+      "X carries accepted-row within-window offset",
+      "RAM $1F carries B58B row metadata",
+      "RAM $32 was set to #$10 immediately before downstream dispatch"
+    ],
+    "significance": "The accepted row is converted from table-space into runtime handler inputs: relative offset in X plus independent metadata in $1F.",
+    "guardrail": "Do not label D87F as renderer, collision, sprite or object routine until its writes/callees establish that role."
+  },
+  "fc17_structure": {
+    "row_index": "RAM $0773",
+    "mapping": "C200[row]",
+    "bit_selector": "row & 7",
+    "state_byte": "0751[C200[row]]",
+    "mask": "F8CF[row & 7]",
+    "predicate": "state_byte & mask != 0",
+    "inference": "This is a packed-bit membership/enable test: rows are represented by bits in runtime state rather than a byte flag per row."
+  },
+  "pipeline_summary": [
+    "B312 key == $93",
+    "FC17 packed-bit gate",
+    "16-bit candidate minus base must pass high-byte window test",
+    "low difference -> $1E",
+    "B58B metadata -> $1F",
+    "downstream call receives $1E as X"
   ]
 }
