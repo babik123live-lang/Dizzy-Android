@@ -480,5 +480,47 @@
     "sorted": true,
     "usage": "B265 scans this table with Y and compares entries to RAM 93",
     "status": "group lookup; semantic label not assigned"
+  },
+  "b265_postmatch": {
+    "code": [
+      "B280 STY $0773",
+      "B283 JSR $FC17",
+      "B286 BEQ $B2A0",
+      "B288 LDY $0773",
+      "B28B LDA $B3E5,Y",
+      "B28E SEC",
+      "B28F SBC $03BB",
+      "B292 STA $1E",
+      "B294 LDA $B4B8,Y",
+      "B297 SBC $03BC",
+      "B29A BNE $B301",
+      "B29C LDA $B58B,Y",
+      "B29F TAY",
+      "B2A0 JSR $1F84"
+    ],
+    "parallel_tables": [
+      {
+        "cpu": "B312",
+        "role": "group key compared with RAM $93"
+      },
+      {
+        "cpu": "B3E5",
+        "delta_from_B312": 211,
+        "role": "indexed by same Y; arithmetic with $03BB"
+      },
+      {
+        "cpu": "B4B8",
+        "delta_from_B3E5": 211,
+        "role": "indexed by same Y; arithmetic with $03BC"
+      },
+      {
+        "cpu": "B58B",
+        "delta_from_B4B8": 211,
+        "role": "indexed by same Y; loaded into Y"
+      }
+    ],
+    "structural_result": "B312/B3E5/B4B8/B58B are four aligned 211-byte columns (210 entries plus boundary/terminator spacing) indexed by the same Y. The matched B312 index selects three companion values.",
+    "inference": "The data is a structure-of-arrays object/placement table. B3E5 and B4B8 participate in 16-bit subtraction against RAM $03BB/$03BC, strongly suggesting a 16-bit position/address-like quantity, but exact semantics are not yet named.",
+    "next": "Extract all four columns for 210 entries and correlate B3E5/B4B8/B58B with runtime variables and the 64-record F550 table."
   }
 }
