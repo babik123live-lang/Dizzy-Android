@@ -15,6 +15,10 @@ data class OriginalLocationDescriptor(
     val mainStarCount:Int
 ) {
     val widthPx:Int get() = widthColumns32 * 32
+    fun leftDestination(worldX:Int):Int =
+        OriginalTransitionCatalog.resolve(leftTransitionCpu, worldX)
+    fun rightDestination(worldX:Int):Int =
+        OriginalTransitionCatalog.resolve(rightTransitionCpu, worldX)
 }
 
 /** ROM-derived normal location descriptors indexed by RAM $93 in original routine $C500. */
