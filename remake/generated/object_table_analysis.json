@@ -334,5 +334,26 @@
     ],
     "conclusion": "Recursive control-flow trace from NMI/RESET/IRQ in the fixed bank reaches the routine ending at F54F and does not fall through into F550 table data. No reachable direct absolute instruction in this conservative trace references F550-F7CF. Table access is therefore likely indirect/indexed through RAM/pointer state or from switchable-bank code; semantics remain unassigned.",
     "caveat": "Trace follows official 6502 lengths, direct JSR/JMP and relative branches in the fixed bank; indirect JMP targets and mapper-selected switchable-bank execution require separate state-aware analysis."
+  },
+  "indirect_access_batch": {
+    "rom_sha256_verified_again": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+    "vectors_raw_hex": "07c0f3edf9ff",
+    "vectors": {
+      "nmi": "0xC007",
+      "reset": "0xEDF3",
+      "irq": "0xFFF9"
+    },
+    "fixed_bank_search": {
+      "literal_table_base_le_50_f5_occurrences": 0,
+      "reversed_f5_50_occurrences": 0,
+      "immediate_A9_50_occurrences": [
+        "0xE192",
+        "0xE21D"
+      ],
+      "immediate_A9_F5_occurrences": [],
+      "note": "The two reachable-looking A9 #$50 sites store $50 into $A3 but are followed by unrelated constants ($1A/$12 into $93), so they are not evidence of constructing pointer $F550."
+    },
+    "inference": "No literal $F550 pointer construction was found in the fixed bank. Combined with zero reachable direct absolute references, access is not a simple fixed-bank absolute/literal-base load. Next target is switchable-bank code and RAM pointer provenance.",
+    "evidence_level": "byte-search plus fixed-bank context; no field semantics assigned"
   }
 }
