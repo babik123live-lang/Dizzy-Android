@@ -96,6 +96,9 @@ def main():
         d=bs(prg,1,ptr,DESCRIPTOR_SIZE)
         width=d[0]; metatile_base=w16(d,3); metatile_bank=d[9]
         left=w16(d,5); right=w16(d,7); map_ptr=w16(d,20)
+        chr_upload_list=w16(d,14)
+        text_stream=w16(d,16)
+        routine_list=w16(d,18)
         assert 1<=width<=96
         assert 0<=metatile_bank<=14
         assert 0x8000<=metatile_base<=0xBFFF
@@ -105,7 +108,16 @@ def main():
         assert len(grid)==width*6
         used=sorted(set(grid))
         assert metatile_base + max(used)*17 + 16 <= 0xBFFF
-        metatiles={str(cell):bs(prg,metatile_bank,metatile_base+cell*17,17).hex() for cell in used}
+        metatiles={}
+        for cell in used:
+            rec=bs(prg,metatile_bank,metatile_base+cell*17,17)
+            assert len(rec)==17
+            tiles=list(rec[:16])
+            metatiles[str(cell)]={
+                'tiles_4x4':[tiles[0:4],tiles[4:8],tiles[8:12],tiles[12:16]],
+                'raw17':rec[16],
+                'raw_hex':rec.hex(),
+            }
         lrows=transition_table(prg,left); rrows=transition_table(prg,right)
         assert lrows[-1]['threshold_x']==0xFFFF
         assert rrows[-1]['threshold_x']==0xFFFF
@@ -124,10 +136,12 @@ def main():
             'metatile_base_cpu':metatile_base,'metatile_bank':metatile_bank,
             'left_transition_cpu':left,'right_transition_cpu':right,
             'raw10_11':w16(d,10),'raw12_13':w16(d,12),
-            'raw14_15':w16(d,14),'raw16_17':w16(d,16),'raw18_19':w16(d,18),
+            'chr_upload_list_cpu':chr_upload_list,
+            'text_stream_cpu':text_stream,
+            'routine_list_cpu':routine_list,
             'map_stream_bank':2,'map_stream_cpu':map_ptr,'map_rows':6,
             'map_cell_count':len(grid),'used_cell_ids':used,'map_cells':grid,
-            'metatiles_17_bytes':metatiles,'main_star_count':counts[key],
+            'metatiles':metatiles,'main_star_count':counts[key],
             'left':lrows,'right':rrows,
         })
 
@@ -142,6 +156,17 @@ def main():
     assert all(x['map_rows']==6 and x['map_cell_count']==x['width_columns_32px']*6 for x in locations)
     assert all(x['map_stream_bank']==2 for x in locations)
     assert set(x['metatile_bank'] for x in locations)=={3,4,5,9}
+    assert all(0x8000<=x['chr_upload_list_cpu']<=0xBFFF for x in locations)
+    assert all(0x8000<=x['text_stream_cpu']<=0xBFFF for x in locations)
+    assert all(0x8000<=x['routine_list_cpu']<=0xBFFF for x in locations)
+    assert bs(prg,FIXED_BANK,0xC6C4,0x75).find(bytes.fromhex('b1bd'))>=0
+    assert bs(prg,FIXED_BANK,0xC6C4,0x75).find(bytes.fromhex('2084de'))>=0
+    assert bs(prg,FIXED_BANK,0xF08B,0x20).startswith(bytes.fromhex('a9068d10c0adbd03'))
+    assert bytes.fromhex('2070db') in bs(prg,FIXED_BANK,0xF090,0x20)
+    assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('b1cb'))>=0
+    assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('6c1c00'))>=0
+    assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a510290318651c'))>=0
+    assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a000b11c9d0001a004b11c9d0101a008b11c9d0201a00cb11c9d0301'))>=0
     assert [x['key'] for x in locations]==list(range(50))
     assert locations[0]['descriptor_cpu']==0xA882
     assert locations[16]['descriptor_cpu']==0xB615
@@ -166,6 +191,16 @@ def main():
         'normal_transition_edge_count':len(normal_edges),
         'unique_transition_table_count':len(all_transition_ptrs),
         'special_destination_values':sorted(special_dests),
+        'metatile_format':{
+            'bytes_per_cell_definition':17,
+            'tile_matrix':'first 16 bytes form a 4x4 8x8-tile matrix; C96C selects one column using fine X and offsets 0,4,8,12',
+            'raw17':'separate byte consumed by C96C; semantic name intentionally withheld until its PPU/runtime role is proven',
+        },
+        'descriptor_fields_proven':{
+            'bytes_14_15':'CHR upload-list pointer consumed by C6C7 and DE84',
+            'bytes_16_17':'bank-6 text stream pointer consumed by F090 and DB70',
+            'bytes_18_19':'bank-1 routine-dispatch list consumed by F439',
+        },
         'locations':locations,'normal_edges':normal_edges,
     }
     out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
