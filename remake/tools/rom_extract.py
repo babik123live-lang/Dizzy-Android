@@ -59,6 +59,20 @@ def main():
         if c["start_prg_offset"] < covered_until:
             continue
         filtered.append(c); covered_until=end
+    # Verify candidate table addresses only when preceded by a 6502 opcode that
+    # actually consumes a 16-bit absolute operand. A raw byte pair is not proof.
+    abs_ops={0x20:"JSR",0x4c:"JMP",0xad:"LDA",0xbd:"LDA_X",0xb9:"LDA_Y",
+             0x8d:"STA",0x9d:"STA_X",0x99:"STA_Y",0xae:"LDX",0xac:"LDY",
+             0xcd:"CMP",0xed:"SBC",0x6d:"ADC",0x2d:"AND",0x0d:"ORA",0x4d:"EOR"}
+    for c in filtered:
+        cpu_addr=0x8000 + (c["start_prg_offset"] & 0x7fff)
+        lo,hi=cpu_addr & 0xff,(cpu_addr>>8)&0xff
+        refs=[]
+        for i in range(len(prg)-2):
+            if prg[i] in abs_ops and prg[i+1]==lo and prg[i+2]==hi:
+                refs.append({"prg_offset":i,"opcode":abs_ops[prg[i]],"cpu_address":f"0x{cpu_addr:04X}"})
+        c["absolute_6502_refs"]=refs
+        c["verified_by_code_reference"]=bool(refs)
     (out/"persistent_object_candidates.json").write_text(
         json.dumps(filtered,indent=2,ensure_ascii=False),encoding="utf-8")
 if __name__=="__main__": main()
