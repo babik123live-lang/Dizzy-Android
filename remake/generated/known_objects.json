@@ -1,0 +1,28 @@
+{
+  "star_plant": {
+    "file_offset": 260918,
+    "prg_offset": 260902,
+    "area_id": 15,
+    "x": 47,
+    "sub_area_id": 8,
+    "y": 158,
+    "sprite_address": 35683,
+    "interaction_id": 2,
+    "description_address": 33480,
+    "interaction_sub_id": 3,
+    "raw": "0F 2F 08 9E 63 8B 02 C8 82 03"
+  },
+  "plank": {
+    "file_offset": 260434,
+    "prg_offset": 260418,
+    "area_id": 14,
+    "x": 244,
+    "sub_area_id": 1,
+    "y": 168,
+    "sprite_address": 42332,
+    "interaction_id": 29,
+    "description_address": 33780,
+    "interaction_sub_id": 0,
+    "raw": "0E F4 01 A8 5C A5 1D F4 83 00"
+  }
+}
