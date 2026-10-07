@@ -692,5 +692,23 @@
     ],
     "status": "unverified_candidate_only",
     "note": "Correction: the bytes around PRG offset 99828 do not establish that 64 F5 is an executable-code pointer reference. The candidate runs are retained only as scanner output until loader/disassembly evidence proves the record layout."
+  },
+  "extraction_validation": {
+    "rom_sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+    "candidate_runs": [
+      {
+        "start_prg_offset": 259428,
+        "count": 45,
+        "cpu_address": "0xF564",
+        "absolute_6502_refs": []
+      },
+      {
+        "start_prg_offset": 259888,
+        "count": 16,
+        "cpu_address": "0xF730",
+        "absolute_6502_refs": []
+      }
+    ],
+    "conclusion": "Both scanner runs reproduce from the supplied ROM, but neither start address has a direct absolute 6502 reference. Keep both unverified."
   }
 }
