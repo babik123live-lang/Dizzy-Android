@@ -3,43 +3,61 @@ import argparse, hashlib, json, pathlib, re
 
 
 def decode_de84_stream(prg, bank, src_cpu, count):
-    """Decode the game's $DE84 compressed CHR stream into 16-byte NES tiles."""
+    """Byte-faithful model of the game's $DE84 CHR decoder."""
     if not (0 <= bank < len(prg)//0x4000):
         raise ValueError("bank out of range")
     if not (0x8000 <= src_cpu <= 0xBFFF):
         raise ValueError("source CPU address out of switchable-bank range")
     bank_data=prg[bank*0x4000:(bank+1)*0x4000]
     p=src_cpu-0x8000
-    tiles=[]
-    trace=[]
+    tiles=[]; trace=[]
     for block in range(count):
         block_start=p
         header=bank_data[p]; p+=1
-        repeat=header & 0x0F
-        literal_count=(header >> 4) + 1
-        remaining=16
-        out_bytes=[]
-        last=None
-        for _ in range(literal_count):
-            if remaining == 0: break
-            last=bank_data[p]; p+=1
-            out_bytes.append(last); remaining-=1
-        if remaining and last is not None:
-            extra=remaining if repeat == 0 else min(repeat,remaining)
-            out_bytes.extend([last]*extra); remaining-=extra
-        while remaining:
-            last=bank_data[p]; p+=1
-            out_bytes.append(last); remaining-=1
-        if len(out_bytes) != 16:
-            raise AssertionError("DE84 block did not decode to 16 bytes")
-        tiles.append(bytes(out_bytes))
+        repeat=header & 0x0f
+        literal=(header>>4)+1
+        x=16
+        out=[]
+        while True:
+            a=bank_data[p]
+            out.append(a)
+            literal=(literal-1)&0xff
+            if literal != 0:
+                x=(x-1)&0xff
+                if x:
+                    p+=1
+                    continue
+                p+=1
+                break
+            x=(x-1)&0xff
+            if not x:
+                p+=1
+                break
+            out.append(a)
+            repeat=(repeat-1)&0xff
+            while repeat != 0:
+                x=(x-1)&0xff
+                if not x:
+                    p+=1
+                    break
+                out.append(a)
+                repeat=(repeat-1)&0xff
+            if not x:
+                break
+            x=(x-1)&0xff
+            if x:
+                p+=1
+                continue
+            p+=1
+            break
+        if len(out) != 16:
+            raise AssertionError((hex(0x8000+block_start),hex(header),len(out)))
+        tiles.append(bytes(out))
         trace.append({
             "block":block,
             "source_cpu_start":0x8000+block_start,
             "source_cpu_end_exclusive":0x8000+p,
-            "header":header,
-            "literal_count":literal_count,
-            "repeat_nibble":repeat
+            "header":header
         })
     return tiles,trace,0x8000+p
 
