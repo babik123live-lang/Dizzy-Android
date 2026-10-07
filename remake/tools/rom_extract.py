@@ -103,30 +103,6 @@ def main():
 
     resources=extract_chr_resource_table(prg)
     (out/"chr_resource_table.json").write_text(json.dumps(resources,indent=2),encoding="utf-8")
-    # Resource 9 is proven by $DDE1 and its call site to populate pattern table 1
-    # from tile $4D. Decode the exact frames later emitted as OAM tiles $4F-$52.
-    r9=resources[9]
-    decoded,trace,source_end=decode_de84_stream(
-        prg,r9["source_bank"],r9["source_cpu"],r9["tile_count"])
-    wanted=[]
-    for tile_no in range(0x4F,0x53):
-        idx=tile_no-r9["destination_tile"]
-        tile=decoded[idx]
-        wanted.append({
-            "tile":tile_no,
-            "raw_hex":tile.hex(),
-            "pixels_2bpp":decode_nes_2bpp(tile),
-            "decode_trace":trace[idx]
-        })
-    chr_evidence={
-        "resource_index":9,
-        "resource":r9,
-        "source_cpu_end_exclusive":source_end,
-        "tiles":wanted
-    }
-    (out/"chr_tiles_4f_52.json").write_text(
-        json.dumps(chr_evidence,indent=2),encoding="utf-8")
-
     # Tri-lingual room prose starts in the later PRG banks. Keep offsets so the
     # remake can replace strings without depending on the NES renderer.
     strings=[]
