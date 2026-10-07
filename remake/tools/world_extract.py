@@ -299,7 +299,20 @@ def main():
             'count_zero_fa58_entries':61,'de84_entries':243,
             'target_half_raw_counts':{'1':84,'0':220},
         },
+        'collision_masks':{
+            'unique_tables':12,'bytes_per_table':26,'tile_domain':'0..207',
+            'bit_order':'tile N -> byte N//8, mask 0x80>>(N&7)',
+            'meaning':'nonzero membership is used by original player movement collision checks via DF0D/DFA5/DFF5',
+        },
+        'palette_cycles':{
+            'unique_tables':19,'bytes_per_table':42,
+            'layout':'3 initial bytes + 3 phases x 13 bytes',
+            'phase_ram':'0x03CD','phase_values':[0,1,2],
+            'consumer':'bank-1 BAA0 builds PPU palette commands; fixed-bank DAD5 writes them through $2006/$2007',
+        },
         'descriptor_fields_proven':{
+            'bytes_10_11':'26-byte tile collision bitmask pointer consumed by DFA5/DFF5',
+            'bytes_12_13':'42-byte palette-cycle data pointer consumed by BAA0',
             'bytes_14_15':'CHR upload-list pointer consumed by C6C7 and DE84',
             'bytes_16_17':'bank-6 text stream pointer consumed by F090 and DB70',
             'bytes_18_19':'bank-1 routine-dispatch list consumed by F439',
