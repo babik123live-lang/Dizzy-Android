@@ -113,6 +113,7 @@ def main():
     assert max(x['y'] for x in f498_placements)==152
     assert len(f46f_args)==23 and sorted(set(x['raw'] for x in f46f_args))==[3,10,46,86,208,214]
     assert len(f492_args)==3 and {x['raw'] for x in f492_args}=={115}
+    assert [x['location_key'] for x in f492_args]==[45,46,47]
     assert len(f4c1_ranges)==4
     assert [(x['x_start'],x['x_end'],x['raw_parameter']) for x in f4c1_ranges]==[
         (100,500,176),(804,928,0),(0,200,144),(0,184,176)]
@@ -125,6 +126,14 @@ def main():
     assert bs(prg,0,0x87EB,0x3A).find(bytes.fromhex('a5221869f8a8'))>=0
     assert bs(prg,0,0x87EB,0x3A).count(bytes.fromhex('207fd8'))==2
 
+    # F46F/F492 load one threshold byte, select bank 8, then AAD3/AB03 scan
+    # OAM entries and set sprite attribute bit $20 on opposite sides of the threshold.
+    assert bs(prg,15,0xF475,0x1D).find(bytes.fromhex('a9088d12c0'))>=0
+    assert bs(prg,8,0xAAD3,0x30).find(bytes.fromhex('c534b00d'))>=0
+    assert bs(prg,8,0xAAD3,0x30).find(bytes.fromhex('09209d0202'))>=0
+    assert bs(prg,8,0xAB03,0x30).find(bytes.fromhex('c534900d'))>=0
+    assert bs(prg,8,0xAB03,0x30).find(bytes.fromhex('09209d0202'))>=0
+
     result={
         'rom_sha256':hashlib.sha256(raw).hexdigest(),
         'location_count':50,
@@ -135,6 +144,14 @@ def main():
         'f498_two_tile_placements':f498_placements,
         'f46f_single_args':f46f_args,
         'f492_single_args':f492_args,
+        'sprite_priority_rules':{
+            'below_threshold_handler':'0xF46F',
+            'at_or_above_threshold_handler':'0xF492',
+            'selected_bank':8,
+            'oam_attribute_bit_set':32,
+            'below_threshold':f46f_args,
+            'at_or_above_threshold':f492_args,
+        },
         'f4c1_world_x_ranges':f4c1_ranges,
         'scripts':scripts,
     }
