@@ -1,53 +1,42 @@
 name: Build Dizzy APK
-
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
+  push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Unpack project
+      - uses: actions/checkout@v4
+      - name: Restore complete project
         run: |
-          unzip -o Dizzy-Android-Project.zip -d project
-          ls -la project
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
+          cp app/src/main/assets/index.html /tmp/index.html
+          rm -rf /tmp/fullproject
+          mkdir -p /tmp/fullproject
+          unzip -q Dizzy-Android-Project.zip -d /tmp/fullproject
+          cp -a /tmp/fullproject/Dizzy-Android-Project/. .
+          cp /tmp/index.html app/src/main/assets/index.html
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Bundle JSNES 2.0.0
-        working-directory: project/Dizzy-Android-Project
+      - name: Bundle JSNES
         run: |
           mkdir -p .ci
           npm install --prefix .ci --no-save jsnes@2.0.0
           cp .ci/node_modules/jsnes/dist/jsnes.min.js app/src/main/assets/jsnes.min.js
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
       - name: Build APK
-        working-directory: project/Dizzy-Android-Project
-        run: gradle assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+        run: gradle assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
         with:
           name: Dizzy-Android-APK
-          path: project/Dizzy-Android-Project/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
