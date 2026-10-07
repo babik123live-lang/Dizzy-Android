@@ -302,5 +302,37 @@
       "table_bank_offset": 13648
     },
     "next_required_proof": "Disassemble the final fixed bank from known vectors/control-flow roots, then retain only reachable instructions referencing $F550-$F7CF."
+  },
+  "control_flow_batch": {
+    "rom_sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+    "vectors": {
+      "nmi": "0xC007",
+      "reset": "0xEDF3",
+      "irq": "0xFFF9"
+    },
+    "final_bank_prg_range": [
+      245760,
+      262143
+    ],
+    "table_cpu_range": [
+      "0xF550",
+      "0xF7CF"
+    ],
+    "reachable_instruction_starts_traced": 1397,
+    "direct_reachable_absolute_refs_into_table": 0,
+    "reachable_table_instruction_starts": 0,
+    "boundary_trace": [
+      "F540: STA $0531,X",
+      "F543: LDX $30",
+      "F545: INX",
+      "F546: CPX $C8",
+      "F548: BNE $F518",
+      "F54A: LDA #$00",
+      "F54C: STA $C00A",
+      "F54F: RTS",
+      "F550: table data begins"
+    ],
+    "conclusion": "Recursive control-flow trace from NMI/RESET/IRQ in the fixed bank reaches the routine ending at F54F and does not fall through into F550 table data. No reachable direct absolute instruction in this conservative trace references F550-F7CF. Table access is therefore likely indirect/indexed through RAM/pointer state or from switchable-bank code; semantics remain unassigned.",
+    "caveat": "Trace follows official 6502 lengths, direct JSR/JMP and relative branches in the fixed bank; indirect JMP targets and mapper-selected switchable-bank execution require separate state-aware analysis."
   }
 }
