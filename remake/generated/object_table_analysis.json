@@ -1343,5 +1343,66 @@
       "phase": "$03CD = 0 for slow counter 00-9F, 1 for A0-C7, 2 for C8-FF",
       "catalog": "OriginalPaletteCycleCatalog.kt"
     }
+  },
+  "player_motion_batch": {
+    "vertical": {
+      "velocity_ram": "$AB",
+      "per_tick": "INC $AB before movement",
+      "normal_jump_seed": "$F0 (-16)",
+      "special_jump_seed": "$F8 (-8)",
+      "base_pixel_delta": "signed velocity divided by 4 with floor behavior for negative values",
+      "normal_unobstructed_rise_px": 36,
+      "caution": "Original code has an additional conditional half-speed shift in specific states; native engine must not replace it with one universal gravity constant."
+    },
+    "horizontal": {
+      "direction_ram": "$D0/$D1",
+      "accel_ram": "$CF",
+      "fraction_ram": "$D2",
+      "accel_max": 48,
+      "fraction_table_cpu": "$870F",
+      "max_coarse_pixels_per_tick": 2,
+      "rule": "same held direction increments CF to 48; direction change/no match halves CF"
+    },
+    "collision_probes": [
+      [
+        -4,
+        -1
+      ],
+      [
+        4,
+        -1
+      ],
+      [
+        -8,
+        -12
+      ],
+      [
+        8,
+        -12
+      ],
+      [
+        -4,
+        -26
+      ],
+      [
+        4,
+        -26
+      ],
+      [
+        -4,
+        0
+      ],
+      [
+        4,
+        0
+      ]
+    ],
+    "extractor": "remake/tools/player_extract.py"
+  },
+  "world_x_origin": {
+    "descriptor_bytes": "1-2",
+    "runtime_ram": "$91/$92",
+    "formula": "newLocalX = oldLocalX + oldOriginX - newOriginX",
+    "catalog": "OriginalWorldXOriginCatalog.kt"
   }
 }
