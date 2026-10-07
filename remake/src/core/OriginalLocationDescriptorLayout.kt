@@ -3,7 +3,7 @@ package com.dizzy.remake.core
 /**
  * Byte offsets of the 22-byte location descriptor consumed by original routine $C500.
  * Names are used only where the consumer has been traced. The two auxiliary
- * pointers remain deliberately raw until their runtime roles are proven.
+ * pointers are named only after tracing their original consumers.
  */
 object OriginalLocationDescriptorLayout {
     const val BYTE_SIZE = 22
@@ -17,10 +17,10 @@ object OriginalLocationDescriptorLayout {
     const val RIGHT_TRANSITION_LO = 7
     const val RIGHT_TRANSITION_HI = 8
     const val METATILE_BANK = 9
-    const val AUX10_LO = 10
-    const val AUX10_HI = 11
-    const val AUX12_LO = 12
-    const val AUX12_HI = 13
+    const val COLLISION_MASK_LO = 10
+    const val COLLISION_MASK_HI = 11
+    const val PALETTE_DATA_LO = 12
+    const val PALETTE_DATA_HI = 13
     const val CHR_UPLOAD_LIST_LO = 14
     const val CHR_UPLOAD_LIST_HI = 15
     const val TEXT_STREAM_LO = 16
