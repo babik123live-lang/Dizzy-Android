@@ -1,16 +1,23 @@
 package com.dizzy.remake.core
 
 /**
- * ROM-derived persistent-object records. These are data records, not guessed
- * scene geometry. Field meanings are provisional: the first and third bytes
- * are retained as raw ROM values and must not be treated as RoomCatalog ids
- * until the original loader code proves their semantics.
+ * ROM-derived persistent-object records loaded by bank-0 code at $8834.
+ * There are 64 complete 10-byte records at $F550-$F7CF. The following byte
+ * at $F7D0 is an $FF cache sentinel, not a 65th complete record.
+ *
+ * The loader later compares record byte 0 directly with runtime location key
+ * RAM $93, proving raw0/locationKey semantics independently of RoomCatalog.
  */
 object OriginalObjectCatalog {
     const val RECORD_COUNT = 64
     const val TABLE_START_PRG_OFFSET = 259408
     const val TABLE_CPU_ADDRESS = 0xF550
     const val TABLE_END_EXCLUSIVE_PRG_OFFSET = TABLE_START_PRG_OFFSET + RECORD_COUNT * OriginalObject.BYTE_SIZE
+    const val TABLE_END_EXCLUSIVE_CPU_ADDRESS = 0xF7D0
+    const val CACHE_START_RAM = 0x05CF
+    const val CACHE_RECORD_SIZE = 5
+    const val CACHE_COPY_COUNT = 65
+    const val CACHE_SENTINEL_FIRST_BYTE = 0xFF
     private val rows = arrayOf(
         intArrayOf(255,50,0,40,32772,0,44357,0),
         intArrayOf(255,50,0,40,32772,0,44357,0),
@@ -86,6 +93,11 @@ object OriginalObjectCatalog {
         OriginalObject(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7])
     }
 
-    /** Provisional raw-field filter; do not use this to drive room layout yet. */
-    fun byRaw0(value:Int): List<OriginalObject> = all.filter { it.raw0 == value }
+    /** Exact original runtime grouping: bank-0 $88F4 compares byte 0 with RAM $93. */
+    fun forLocationKey(value:Int): List<OriginalObject> =
+        all.filter { it.locationKey == value }
+
+    /** Compatibility alias for older analysis code. */
+    @Deprecated("Use forLocationKey; raw0 is proven to be the runtime location key")
+    fun byRaw0(value:Int): List<OriginalObject> = forLocationKey(value)
 }
