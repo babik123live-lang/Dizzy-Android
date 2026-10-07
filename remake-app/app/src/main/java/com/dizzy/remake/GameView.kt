@@ -16,7 +16,7 @@ class GameView(context: Context) : View(context) {
     private val viewport = Viewport()
     private val p = Paint(Paint.ANTI_ALIAS_FLAG)
     private var running = false
-    private var t = 0f
+    private var t = 0f\n    private val audio = RemasterAudio()\n    private var lastA = false
 
     private val frame = object : Runnable {
         override fun run() {
@@ -26,8 +26,8 @@ class GameView(context: Context) : View(context) {
         }
     }
 
-    override fun onAttachedToWindow() { super.onAttachedToWindow(); running=true; clock.reset(System.nanoTime()); postOnAnimation(frame) }
-    override fun onDetachedFromWindow() { running=false; removeCallbacks(frame); super.onDetachedFromWindow() }
+    override fun onAttachedToWindow() { super.onAttachedToWindow(); running=true; audio.start(); clock.reset(System.nanoTime()); postOnAnimation(frame) }
+    override fun onDetachedFromWindow() { running=false; audio.stop(); removeCallbacks(frame); super.onDetachedFromWindow() }
 
     private fun sx(x:Float)= (x-viewport.x)*(width.toFloat()/viewport.width)
     private fun sy(y:Float)= (y-viewport.y)*(height.toFloat()/viewport.height)
@@ -76,8 +76,8 @@ class GameView(context: Context) : View(context) {
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
         val down=e.actionMasked!=MotionEvent.ACTION_UP&&e.actionMasked!=MotionEvent.ACTION_CANCEL
-        if(!down){input.left=false;input.right=false;input.a=false;return true}
-        input.left=e.x<width*.18f; input.right=e.x>=width*.18f&&e.x<width*.36f; input.a=e.x>width*.72f
+        if(!down){input.left=false;input.right=false;input.a=false;lastA=false;return true}
+        input.left=e.x<width*.18f; input.right=e.x>=width*.18f&&e.x<width*.36f; input.a=e.x>width*.72f\n        if(input.a && !lastA) audio.jump()\n        lastA=input.a
         return true
     }
 }
