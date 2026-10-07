@@ -5,9 +5,11 @@ enum class Region { TREEHOUSE, COUNTRYSIDE, COAST, GRAVEYARD, PIRATE_SHIP, KELDO
 data class RoomDescriptor(val textId:Int,val region:Region,val namePl:String)
 
 /**
- * Polish short labels aligned to the original runtime location keys 0..49.
- * These labels summarize the original room-description text; geometry and
- * transitions come from OriginalLocationCatalog, not from this list.
+ * Provisional Polish display labels keyed 0..49.
+ * They never drive original geometry, transitions or identity-sensitive logic;
+ * those come from the ROM-derived catalogs. Exact naming remains separate from
+ * the runtime location reconstruction because some original text pointers are
+ * conditionally reused or adjusted by game code.
  */
 object RoomCatalog {
     val rooms=listOf(
