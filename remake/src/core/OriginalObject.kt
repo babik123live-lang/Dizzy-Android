@@ -5,9 +5,9 @@ package com.dizzy.remake.core
  * Layout is based on the original loader used when an area is entered.
  */
 data class OriginalObject(
-    val areaId:Int,
+    val raw0:Int,
     val x:Int,
-    val subAreaId:Int,
+    val raw2:Int,
     val y:Int,
     val spriteAddress:Int,
     val interactionId:Int,
