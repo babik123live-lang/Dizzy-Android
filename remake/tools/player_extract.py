@@ -38,7 +38,7 @@ def main():
     assert b0(prg,0x82F1,0x2B).startswith(bytes.fromhex(
         'e6aba5ab10034c57854ca285a5ab1007386a386a4c17834a4a'))
     assert bytes.fromhex('a6a5e003b007a6ade008b0014a') in b0(prg,0x830A,16)
-    assert bytes.fromhex('a9f086ab') in b0(prg,0x8286,12)
+    assert bytes.fromhex('a9f085ab') in b0(prg,0x8286,12)
     assert bytes.fromhex('a2f886ab') in b0(prg,0x8265,16)
 
     # Horizontal acceleration $CF, fractional accumulator $D2 and table $870F.
@@ -48,7 +48,7 @@ def main():
     expected=[0,0,0]+list(range(5,230,5))+[0]
     assert table==expected and len(table)==49
     assert b0(prg,0x86E8,0x22).find(bytes.fromhex('bd0f871865d285d298659c859c'))>=0
-    assert b0(prg,0x86FA,0x15).find(bytes.fromhex('a5d238fd0f8785d2a59ce532e532859c'))>=0
+    assert b0(prg,0x86FA,0x15).find(bytes.fromhex('a5d238fd0f8785d2a59ce532859c'))>=0
 
     # Player point-collision probes used by bank-0 movement.
     probe_sequences={
@@ -63,7 +63,7 @@ def main():
         assert seq in region,name
 
     # Collision bitset consumer and mask order.
-    assert fixed(prg,0xDFF1,15)==bytes.fromhex('b900c2a8b1bba0008c0ac03d00e0')
+    assert fixed(prg,0xDFF1,14)==bytes.fromhex('b900c2a8b1bba0008c0ac03d00e0')
     assert fixed(prg,0xE000,8)==bytes.fromhex('8040201008040201')
 
     v=0xF0; rise=0
