@@ -11,6 +11,7 @@ fun main() {
     check(all.any { it.raw0 == 49 && it.x == 240 && it.y == 60 && it.spriteAddress == 35912 && it.descriptionAddress == 44293 })
     check(OriginalObjectCatalog.inArea(19).size == 3)
     check(OriginalObjectCatalog.inArea(20).size == 3)
-    check(OriginalObjectCatalog.inArea(49).isEmpty())
+    check(OriginalObjectCatalog.inArea(49).size == 1)
+    check(OriginalObjectCatalog.inArea(50).isEmpty())
     println("original object catalog self-test OK")
 }
