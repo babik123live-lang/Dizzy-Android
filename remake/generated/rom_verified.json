@@ -1,0 +1,9 @@
+{
+  "file_size": 262160,
+  "header_hex": "4e45531a100071480000000702000001",
+  "format": "iNES",
+  "prg_bytes": 262144,
+  "chr_bytes": 0,
+  "mapper": 71,
+  "chr_memory": "RAM"
+}
