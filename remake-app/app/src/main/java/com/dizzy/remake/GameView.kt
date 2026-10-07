@@ -121,6 +121,22 @@ class GameView(context: Context) : View(context) {
             world.player.y = 150f
             world.player.vx = 0f
             world.player.vy = 0f
+        } else if (currentRoom == 11 && world.player.x >= world.room.width - 18f) {
+            currentRoom = 12
+            scene = RemasterScenes.room(12)
+            world.room = scene.room
+            world.player.x = 18f
+            world.player.y = 150f
+            world.player.vx = 0f
+            world.player.vy = 0f
+        } else if (currentRoom == 12 && world.player.x <= 2f) {
+            currentRoom = 11
+            scene = RemasterScenes.room(11)
+            world.room = scene.room
+            world.player.x = world.room.width - 38f
+            world.player.y = 150f
+            world.player.vx = 0f
+            world.player.vy = 0f
         } else if (currentRoom == 11 && world.player.x <= 2f) {
             currentRoom = 10
             scene = RemasterScenes.room(10)
