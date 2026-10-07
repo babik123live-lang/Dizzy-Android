@@ -8,7 +8,7 @@ class GameView(c:Context):SurfaceView(c),SurfaceHolder.Callback,Runnable{
  private var running=false; private var thread:Thread?=null
  private val clock=FixedStepClock()
  private val input=InputState()
- private val world=World(Room(0,2048f,240f,listOf(Solid(RectF(0f,220f,2048f,20f)))),Player(128f,180f))
+ private val world=World(Room(0,2048f,240f,listOf(Solid(com.dizzy.remake.core.RectF(0f,220f,2048f,20f)))),Player(128f,180f))
  private val engine=Engine(world,input)
  private val viewport=Viewport()
  private val paint=Paint(Paint.ANTI_ALIAS_FLAG)
@@ -16,7 +16,7 @@ class GameView(c:Context):SurfaceView(c),SurfaceHolder.Callback,Runnable{
  override fun surfaceCreated(h:SurfaceHolder){running=true;thread=Thread(this,"DizzyGame").also{it.start()}}
  override fun surfaceDestroyed(h:SurfaceHolder){running=false;thread?.join(500)}
  override fun surfaceChanged(h:SurfaceHolder,f:Int,w:Int,hh:Int){}
- override fun run(){var last=System.nanoTime();while(running){val n=System.nanoTime();clock.advance((n-last)/1e9){engine.tick()};last=n;drawFrame()}}
+ override fun run(){clock.reset(System.nanoTime());while(running){clock.advance(System.nanoTime()){engine.tick()};drawFrame()}}
  private fun drawFrame(){val c=holder.lockCanvas()?:return;try{
   val sx=width/viewport.width;val sy=height/viewport.height
   c.drawColor(Color.rgb(25,35,55));paint.color=Color.rgb(58,104,61)
