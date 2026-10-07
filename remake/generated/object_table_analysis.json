@@ -666,5 +666,22 @@
       "identify callers of $866B",
       "correlate caller state with RAM $93 used by bank13 B265"
     ]
+  },
+  "input_writer_batch": {
+    "targets": [
+      "$11",
+      "$4E",
+      "$4F",
+      "$93"
+    ],
+    "methodology": "Search reachable decoded code for direct zero-page stores and register stores to these addresses, then group by routine/call context rather than treating raw byte matches as instructions.",
+    "findings": {
+      "$93": "Already observed as comparison key in bank13 B265; treat as runtime group key only.",
+      "$11": "Feeds only its low three bits into the 03BB/03BC base builder at 8670.",
+      "$4E/$4F": "Form the coarse 16-bit input used by the base-building arithmetic.",
+      "relation": "The code path uses $93 as a categorical selector and 03BB/03BC as a separate numeric window base; these are independent selection dimensions."
+    },
+    "semantic_constraint": "Do not collapse $93 and the computed base into a single room/position identifier. The executed code clearly performs a two-stage selection: group match first, numeric-window test second.",
+    "next": "Trace the caller chain that establishes $93 and $4E/$4F before the bank13 call, then correlate with the fourth column passed to $1F84."
   }
 }
