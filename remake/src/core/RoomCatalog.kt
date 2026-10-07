@@ -4,7 +4,7 @@ enum class Region { TREEHOUSE, COUNTRYSIDE, COAST, GRAVEYARD, PIRATE_SHIP, KELDO
 
 data class RoomDescriptor(val textId:Int,val region:Region,val namePl:String)
 
-object RoomCatalog {
+/** Legacy/provisional Polish labels used by the current placeholder renderer.\n * This is NOT the ROM location-key catalog; original game locations are in OriginalLocationCatalog.\n */\nobject RoomCatalog {
     val rooms=listOf(
         RoomDescriptor(0,Region.TREEHOUSE,"Dom Dizzy'ego"),
         RoomDescriptor(1,Region.TREEHOUSE,"Dom Dylana"),
