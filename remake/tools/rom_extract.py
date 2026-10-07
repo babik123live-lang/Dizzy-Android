@@ -208,4 +208,75 @@ def main():
 
     (out/"persistent_object_candidates.json").write_text(
         json.dumps(filtered,indent=2,ensure_ascii=False),encoding="utf-8")
+
+    # Verified 5-byte CHR upload descriptors consumed by DDE1/DE84.
+    desc_cpu=0xDD55
+    desc_count=28
+    fixed_base=len(prg)-0x4000
+    desc_off=fixed_base+(desc_cpu-0xC000)
+    desc_blob=prg[desc_off:desc_off+desc_count*5]
+    chr_desc=[]
+    for i in range(desc_count):
+        d=desc_blob[i*5:(i+1)*5]
+        src=d[0] | (d[1]<<8)
+        ctrl=d[4]
+        bank=ctrl & 0x0f
+        pattern=(ctrl>>7)&1
+        src_off=bank*0x4000+(src-0x8000) if 0x8000 <= src < 0xC000 else None
+        chr_desc.append({
+            "index":i,
+            "source_cpu":src,
+            "source_bank_raw":bank,
+            "source_prg_offset":src_off,
+            "destination_tile":d[2],
+            "tile_count":d[3],
+            "pattern_table":pattern,
+            "control_raw":ctrl,
+        })
+    (out/"chr_upload_descriptors.json").write_text(
+        json.dumps(chr_desc,indent=2),encoding="utf-8")
+
+    # Descriptor 23 is directly requested by bank 14 at CPU $9158.
+    # It uploads tiles $4F-$52 as four literal 16-byte NES 2bpp patterns.
+    star_desc=chr_desc[23]
+    if not (star_desc["source_bank_raw"]==7 and
+            star_desc["source_cpu"]==0xB33C and
+            star_desc["destination_tile"]==0x4F and
+            star_desc["tile_count"]==4 and
+            star_desc["pattern_table"]==0):
+        raise SystemExit("unexpected tile 4F-52 descriptor")
+    p=star_desc["source_prg_offset"]
+    tiles=[]
+    for tile_no in range(0x4F,0x53):
+        header=prg[p]
+        if header != 0xF0:
+            raise SystemExit("tile 4F-52 stream is no longer literal F0 form")
+        b=prg[p+1:p+17]
+        if len(b)!=16:
+            raise SystemExit("truncated tile stream")
+        plane0=b[:8]; plane1=b[8:]
+        pixels=[
+            [((plane0[y]>>(7-x))&1) | (((plane1[y]>>(7-x))&1)<<1)
+             for x in range(8)]
+            for y in range(8)
+        ]
+        tiles.append({
+            "tile":tile_no,
+            "stream_header":header,
+            "bytes_hex":b.hex(),
+            "pixels":pixels,
+        })
+        p += 17
+    evidence={
+        "descriptor_index":23,
+        "direct_call":{"bank":14,"cpu_address":"0x9158","immediate_index":23},
+        "source_bank_raw":7,
+        "source_cpu":"0xB33C",
+        "source_prg_offset":star_desc["source_prg_offset"],
+        "pattern_table":0,
+        "ppu_range":"0x04F0-0x052F",
+        "tiles":tiles,
+    }
+    (out/"tile_4f_52_evidence.json").write_text(
+        json.dumps(evidence,indent=2),encoding="utf-8")
 if __name__=="__main__": main()
