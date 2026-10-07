@@ -757,8 +757,10 @@
     "record_count": 62,
     "last_record_prg_offset": 260038,
     "first_byte_after_table_offset": 260048,
-    "bytes_after_table_hex": "ffc5a3f009b02a18691ac5a39024a52038e909a8",
+    "bytes_after_table_hex": "c5a3f009b02a18691ac5a39024a52038e909a8a521e900c59dd002c49cb011",
     "boundary_evidence": "Byte 0xFF occurs immediately after 62 consecutive 10-byte records. Following bytes decode plausibly as 6502 code, providing a strong structural boundary for the table.",
-    "status": "62-record boundary strongly supported"
+    "status": "62 consecutive records observed; end boundary still requires code-flow verification",
+    "correction": "The previous claim that 0xFF is immediately after the 62nd record was wrong. 0xFF is the final byte of record 62 (offset 260047). The next byte at 260048 is 0xC5, followed by plausible 6502 code.",
+    "first_byte_after_table": "0xC5"
   }
 }
