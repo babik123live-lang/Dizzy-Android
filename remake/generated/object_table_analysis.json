@@ -1026,5 +1026,50 @@
     "implement DE84 byte-for-byte decoder in rom_extract.py",
     "simulate writes and select those landing at 14F0-152F",
     "emit decoded 2bpp pixels for tiles 4F-52"
-  ]
+  ],
+  "chr_resource_breakthrough": {
+    "resource_table": "$DD55-$DDE0, 28 records x 5 bytes, consumed by $DDE1",
+    "selector_9": {
+      "source_bank": 12,
+      "source_cpu": "$94CF",
+      "destination_tile": "$4D",
+      "tile_count": 53,
+      "pattern_table": 1,
+      "flags": "$8C"
+    },
+    "selector_10": {
+      "source_bank": 12,
+      "source_cpu": "$94CF",
+      "destination_tile": "$4D",
+      "tile_count": 53,
+      "pattern_table": 0,
+      "flags": "$0C"
+    },
+    "call_evidence": [
+      "bank12 $805A loads A=#09 then JSR $DDE1",
+      "bank12 $8085 loads A=#0A then JSR $DDE1"
+    ],
+    "de84_carry_correction": "$DE84 derives the destination pattern-table high bit from carry at entry; $DDE1 sets carry from resource flag bit 7. Direct callers can force/set carry independently.",
+    "decoded_source_end": "$97E6",
+    "target_frames": {
+      "$4F": "000639200001040200063f3ffffefbfd",
+      "$50": "0000000f181810100000000f1f1f1f1f",
+      "$51": "08708000000000000f7fffffffffffff",
+      "$52": "0800085d08080008f7fff7a2f7f7fff7"
+    },
+    "conclusion": "Tiles $4F-$52 are now recovered byte-for-byte from the ROM's compressed CHR stream, with source bank/address and decoder path proven."
+  },
+  "de84_format_correction": {
+    "previous_error": "Pattern table 1 is not hardwired by $DE84.",
+    "actual": "PHA; LDA #0; ADC #0 captures carry into the address high-byte accumulator before four ASL/ROL steps.",
+    "forced_entries": {
+      "$DE80": "SEC then branches to $DE84",
+      "$DE83": "CLC fall-through to $DE84"
+    },
+    "wrapper_notes": [
+      "$DE5F uses SEC before $DE84",
+      "$DE78 uses CLC before $DE84",
+      "$C706 inherits carry from LSR $37"
+    ]
+  }
 }
