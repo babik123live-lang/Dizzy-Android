@@ -248,6 +248,9 @@ def main():
     assert bs(prg,FIXED_BANK,0xDEE3,14)==bytes.fromhex('a9018d0bc020a0baa9008d0ac060')
     assert bs(prg,1,0xBAA0,13)==bytes.fromhex('a900aecd03f00618690dcad0fa')
     assert bytes.fromhex('a460a5cd18690385cd') in bs(prg,1,0xBAD1,16)
+    assert bs(prg,1,0xBAAF,12)==bytes.fromhex('a9bf8d8001a91d8d8101a903')
+    assert bs(prg,1,0xBB03,10)==bytes.fromhex('a9108d8201a2008e8101')
+    assert bs(prg,FIXED_BANK,0xD4F8,18)==bytes.fromhex('add403c9a0900be8c9c89006e8c9e19001ca')
     assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a010b11ca414990301'))>=0
     assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a5830980990001a5829901011869088582a901990201'))>=0
     assert bs(prg,FIXED_BANK,0xC96C,0x8D).find(bytes.fromhex('a510290318651c'))>=0
