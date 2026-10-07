@@ -355,5 +355,14 @@
     },
     "inference": "No literal $F550 pointer construction was found in the fixed bank. Combined with zero reachable direct absolute references, access is not a simple fixed-bank absolute/literal-base load. Next target is switchable-bank code and RAM pointer provenance.",
     "evidence_level": "byte-search plus fixed-bank context; no field semantics assigned"
+  },
+  "switchable_bank_f550": {
+    "hit_count": 1,
+    "prg_offset": 223846,
+    "bank": 13,
+    "bank_offset": 10854,
+    "cpu_address_if_selected": "0xAA66",
+    "status": "candidate only; instruction alignment and reachability not yet proven",
+    "next": "trace mapper bank selection and bank 13 entry points"
   }
 }
