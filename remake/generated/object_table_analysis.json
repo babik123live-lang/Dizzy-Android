@@ -1073,5 +1073,86 @@
       "vertical_c": 10
     },
     "packed_state": "$0751-$0770 = 32 bytes; $C200[id] equals floor(id/8), mask selected by id&7."
+  },
+  "star_system_proven": {
+    "identity": "collectible_stars",
+    "total": 250,
+    "placement_sets": [
+      {
+        "kind": "horizontal_grouped",
+        "count": 210,
+        "table": "bank13 $B312/$B3E5/$B4B8/$B58B",
+        "state_ids": "0-209"
+      },
+      {
+        "kind": "supplemental",
+        "count": 10,
+        "table": "bank10 $8F43",
+        "state_ids": "210-219"
+      },
+      {
+        "kind": "supplemental",
+        "count": 20,
+        "table": "bank13 $8CFE",
+        "state_ids": "220-239"
+      },
+      {
+        "kind": "supplemental",
+        "count": 10,
+        "table": "bank14 $9260",
+        "state_ids": "240-249"
+      }
+    ],
+    "counter": {
+      "ram": "$0772",
+      "initial": 250,
+      "decrement": "$FC75 DEC $0772",
+      "last_item_test": "bank13 $B2D9 CMP #$01"
+    },
+    "state_bits": {
+      "ram": "$0751-$0770",
+      "map": "$C200 maps star id i to byte i/8",
+      "toggle": "$FC60"
+    },
+    "graphics": [
+      {
+        "resource": 23,
+        "source": "bank7 $B33C",
+        "tiles": "$4F-$52",
+        "pattern_table": 0,
+        "animation": [
+          "4F",
+          "50",
+          "51",
+          "52",
+          "51",
+          "50",
+          "4F"
+        ]
+      },
+      {
+        "resource": 22,
+        "source": "bank7 $B2F8",
+        "tiles": "$F0-$F3",
+        "pattern_table": 0,
+        "animation": [
+          "F0",
+          "F1",
+          "F2",
+          "F3",
+          "F2",
+          "F1",
+          "F0"
+        ]
+      }
+    ],
+    "visual_relation": "The two four-frame graphics sets have the same silhouette mask in opposite NES bitplanes, so they are color-index variants of the same star animation.",
+    "correction": "The proven $4F-$52 star resource is in pattern table 0, PPU $04F0-$052F. Earlier generic $14F0-$152F attribution was incorrect because DE84 pattern-table selection comes from carry/control state, not a fixed seed of 1.",
+    "text_evidence": "Game text explicitly requires collecting all stars and has an all-stars-collected message."
+  },
+  "validation_batch": {
+    "checks": 36,
+    "result": "all passed against verified ROM SHA-256",
+    "script": "remake/tools/star_extract.py"
   }
 }
