@@ -77,13 +77,27 @@ def main():
 
     resources=[resource_entry(prg,i) for i in range(RESOURCE_COUNT)]
     star_res=resources[23]
+    assert star_res['source_bank']==7 and star_res['source_cpu']==0xB33C
     assert star_res['destination_tile']==0x4F and star_res['tile_count']==4
     assert star_res['pattern_table']==0
+    assert bank_bytes(prg,14,0x9158,5)==bytes([0xA9,0x17,0x20,0xE1,0xDD])
     decoded,end,controls=decode_resource(prg,star_res)
     assert len(decoded)==64 and controls==[0xF0]*4 and end==0xB380
 
+    alt_res=resources[22]
+    assert alt_res['source_bank']==7 and alt_res['source_cpu']==0xB2F8
+    assert alt_res['destination_tile']==0xF0 and alt_res['tile_count']==4
+    assert bank_bytes(prg,13,0x8042,5)==bytes([0xA9,0x16,0x20,0xE1,0xDD])
+    alt_decoded,alt_end,alt_controls=decode_resource(prg,alt_res)
+    assert len(alt_decoded)==64 and alt_controls==[0xF0]*4 and alt_end==0xB33C
+
     anim=list(bank_bytes(prg,FIXED_BANK,ANIM_CPU,7))
+    alt_anim=list(bank_bytes(prg,13,0x8D3A,7))
     assert anim==[0x4F,0x50,0x51,0x52,0x51,0x50,0x4F]
+    assert alt_anim==[0xF0,0xF1,0xF2,0xF3,0xF2,0xF1,0xF0]
+    for i in range(4):
+        a=decoded[i*16:(i+1)*16]; b=alt_decoded[i*16:(i+1)*16]
+        assert a[:8]==bytes(8) and b[8:]==bytes(8) and a[8:]==b[:8]
 
     stars=[]
     for i in range(MAIN_COUNT):
@@ -105,17 +119,25 @@ def main():
     assert len(stars)==250 and [s['id'] for s in stars]==list(range(250))
     state_map=list(bank_bytes(prg,FIXED_BANK,0xC200,250))
     assert all(state_map[i]==i//8 for i in range(250))
-    assert bytes([0xA9,0xFA,0x8D,0x72,0x07]) in bank_bytes(prg,FIXED_BANK,0xF8D7,15)
+    assert bank_bytes(prg,FIXED_BANK,0xF8E1,5)==bytes([0xA9,0xFA,0x8D,0x72,0x07])
+    assert bank_bytes(prg,FIXED_BANK,0xFC75,3)==bytes([0xCE,0x72,0x07])
+    assert bank_bytes(prg,13,0xB2D9,5)==bytes([0xAD,0x72,0x07,0xC9,0x01])
+    assert b'COLLECT ALL\xfeTHE STARS' in prg
+    assert b'COLLECTED ALL\xfeTHE STARS' in prg
 
     tiles=[]
     for i,tile_id in enumerate(range(0x4F,0x53)):
         tb=decoded[i*16:(i+1)*16]
         tiles.append({'tile':tile_id,'raw_hex':tb.hex(),'pixels':pixels_2bpp(tb)})
 
-    result={'rom_sha256':sha,'proof':{'total_stars':250,'main_horizontal_count':210,
+    result={'rom_sha256':sha,'identity':'collectible_stars',
+        'proof':{'total_stars':250,'main_horizontal_count':210,
         'vertical_counts':[10,20,10],'counter_ram':'0x0772','counter_initial':250,
         'packed_state_ram':'0x0751-0x0770','animation_tiles':anim,
-        'graphics_resource_id':23},'graphics_resource':star_res,'tiles':tiles,'stars':stars}
+        'alternate_animation_tiles':alt_anim,'graphics_resource_id':23,
+        'alternate_graphics_resource_id':22},
+        'graphics_resource':star_res,'alternate_graphics_resource':alt_res,
+        'tiles':tiles,'stars':stars}
     out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
     (out/'star_manifest.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     (out/'graphics_resources.json').write_text(json.dumps(resources,indent=2),encoding='utf-8')
