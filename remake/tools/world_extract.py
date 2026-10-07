@@ -93,6 +93,8 @@ def main():
     assert ((raw[6]>>4)|(raw[7]&0xF0))==71
 
     assert bs(prg,FIXED_BANK,0xC500,19)==bytes.fromhex('a9018d0bc0a5930aaabd03808550bd04808551')
+    assert bs(prg,FIXED_BANK,0xC51A,39).startswith(bytes.fromhex('a59c186591851ea59d6592851fb1508591c8b1508592'))
+    assert bytes.fromhex('a51e38e591859ca51fe592859d') in bs(prg,FIXED_BANK,0xC530,24)
     ptrs=[]
     for key in range(LOCATION_COUNT):
         p=POINTER_TABLE_CPU+key*2
@@ -181,7 +183,7 @@ def main():
         all_transition_ptrs|={left,right}
         locations.append({
             'key':key,'descriptor_cpu':ptr,'width_columns_32px':width,
-            'world_origin_raw':world_origin,
+            'world_origin_x':world_origin,
             'metatile_base_cpu':metatile_base,'metatile_bank':metatile_bank,
             'left_transition_cpu':left,'right_transition_cpu':right,
             'collision_mask_cpu':collision_mask,
@@ -280,6 +282,7 @@ def main():
         'initial_state':{'location_key':0,'world_x':160,'world_x_ram':'0x009C-0x009D','raw_a3':176},
         'descriptor_pointer_table':{'bank':1,'cpu':'0x8003','index':'RAM $93 * 2'},
         'world_x_ram':'0x009C-0x009D','screen_x_ram':'0x00A3',
+        'world_origin_semantics':'descriptor bytes 1/2 are loaded into $91/$92; normal location loads preserve global X as localX + oldOrigin - newOrigin',
         'normal_transition_edge_count':len(normal_edges),
         'unique_transition_table_count':len(all_transition_ptrs),
         'special_destination_values':sorted(special_dests),
