@@ -1,9 +1,5 @@
 package com.dizzy.remake.core
 
-/**
- * 10-byte persistent-object record recovered from the European NES ROM.
- * Layout is based on the original loader used when an area is entered.
- */
 /** Exact 10-byte record decoded from the ROM table; semantics intentionally unassigned. */
 data class OriginalObject(
     val raw0:Int,
