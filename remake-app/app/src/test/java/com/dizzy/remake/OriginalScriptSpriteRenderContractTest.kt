@@ -16,10 +16,10 @@ class OriginalScriptSpriteRenderContractTest {
         assertEquals(0x85,f0.bottomTile)
         assertEquals(0x01,f0.attributes)
 
-        val f4=R.frame(4)
-        assertEquals(0x86,f4.topTile)
-        assertEquals(0x87,f4.bottomTile)
-        assertEquals(0x01,f4.attributes)
+        val f8=R.frame(8)
+        assertEquals(0x86,f8.topTile)
+        assertEquals(0x87,f8.bottomTile)
+        assertEquals(0x01,f8.attributes)
 
         val f16=R.frame(16)
         assertEquals(0x84,f16.topTile)
@@ -27,8 +27,8 @@ class OriginalScriptSpriteRenderContractTest {
         assertEquals(0x41,f16.attributes)
 
         val f20=R.frame(20)
-        assertEquals(0x86,f20.topTile)
-        assertEquals(0x87,f20.bottomTile)
+        assertEquals(0x84,f20.topTile)
+        assertEquals(0x85,f20.bottomTile)
         assertEquals(0x41,f20.attributes)
 
         var bad=false
