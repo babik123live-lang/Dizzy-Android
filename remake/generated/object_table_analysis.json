@@ -683,5 +683,52 @@
     },
     "semantic_constraint": "Do not collapse $93 and the computed base into a single room/position identifier. The executed code clearly performs a two-stage selection: group match first, numeric-window test second.",
     "next": "Trace the caller chain that establishes $93 and $4E/$4F before the bank13 call, then correlate with the fourth column passed to $1F84."
+  },
+  "fixed_bank_writer_evidence": {
+    "raw_rom_sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+    "fixed_bank_writers": {
+      "$11": [
+        "C607",
+        "CBD5",
+        "D415"
+      ],
+      "$4E": [
+        "C5F8",
+        "CA72",
+        "CB77",
+        "CBD3",
+        "CEF9",
+        "CFC6"
+      ],
+      "$4F": [
+        "C60B",
+        "CA51",
+        "CB47",
+        "CBDC",
+        "CE2B",
+        "CEA2",
+        "CEC4",
+        "CF9E"
+      ],
+      "$93": [
+        "E15C",
+        "E198",
+        "E1A9",
+        "E1C5",
+        "E1EE",
+        "E213",
+        "E25D",
+        "E272",
+        "E294",
+        "E2B8",
+        "E303",
+        "E314",
+        "E336",
+        "E347"
+      ]
+    },
+    "notable_initialization": "CBD3-CBDC clears $4E, $11 and $4F together (and nearby state), showing these variables belong to mutable runtime state rather than ROM pointers.",
+    "notable_93": "E1xx/E2xx contains many immediate assignments to $93, including values 0x1F,0x1D,0x13,0x2E,0x18,0x1E,0x2C,0x22. This supports $93 as an explicit categorical/state value.",
+    "correction": "Previous writer summary was qualitative. These are concrete fixed-bank store sites found directly in the verified ROM; reachability of each individual site still requires CFG confirmation."
   }
 }
