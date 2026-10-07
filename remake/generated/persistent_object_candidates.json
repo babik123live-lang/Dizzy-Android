@@ -710,5 +710,27 @@
       }
     ],
     "conclusion": "Both scanner runs reproduce from the supplied ROM, but neither start address has a direct absolute 6502 reference. Keep both unverified."
+  },
+  "pointer_context_analysis": {
+    "0xF564": [
+      {
+        "prg_offset": 99828,
+        "context_hex": "294a9014842aaba2a505bb3d64f5b204932151202a41221eaa1c",
+        "assessment": "preceding byte 0x3D is AND abs,X, so 64 F5 is its operand; this is an actual 6502 absolute-indexed reference to $F564"
+      }
+    ],
+    "0xF730": [
+      {
+        "prg_offset": 202569,
+        "context_hex": "fcfeffff8108083e0888c06830f7c177371f07870300b4077137",
+        "assessment": "not established as an instruction operand"
+      },
+      {
+        "prg_offset": 255423,
+        "context_hex": "e80f20fce9c7e5e0fe07cae530f7e935f0fa072c213637212d2e",
+        "assessment": "preceding byte 0xE5 is zero-page SBC; 30 F7 is not its 16-bit operand"
+      }
+    ],
+    "correction": "The previous opcode whitelist omitted AND abs,X (0x3D). $F564 does have a direct 6502 code reference and is stronger evidence than $F730."
   }
 }
