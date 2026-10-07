@@ -40,6 +40,30 @@ def transition_table(prg,ptr):
         if threshold==0xFFFF: return rows
     raise AssertionError(f'unterminated transition table {ptr:04X}')
 
+def parse_chr_upload_list(prg,ptr):
+    rows=[]; p=ptr; target_half_raw=1; marker_count=0
+    for _ in range(64):
+        first=bb(prg,1,p)
+        if first==0:
+            return rows,marker_count
+        if first==0xFF:
+            marker_count+=1
+            target_half_raw=(target_half_raw-1)&0xff
+            p+=1
+            first=bb(prg,1,p)
+        count=bb(prg,1,p+1)
+        dest=bb(prg,1,p+2)
+        src=bb(prg,1,p+3)|(bb(prg,1,p+4)<<8)
+        assert first in range(0,15)
+        assert 0x8000<=src<=0xBFFF
+        rows.append({
+            'source_bank':first,'count_raw':count,'destination_tile':dest,
+            'source_cpu':src,'target_half_raw':target_half_raw&1,
+            'decoder':'FA58' if count==0 else 'DE84',
+        })
+        p+=5
+    raise AssertionError(f'unterminated CHR upload list {ptr:04X}')
+
 def star_counts(prg):
     counts={k:0 for k in range(LOCATION_COUNT)}
     for i in range(210):
@@ -99,6 +123,7 @@ def main():
         chr_upload_list=w16(d,14)
         text_stream=w16(d,16)
         routine_list=w16(d,18)
+        chr_uploads,chr_marker_count=parse_chr_upload_list(prg,chr_upload_list)
         assert 1<=width<=96
         assert 0<=metatile_bank<=14
         assert 0x8000<=metatile_base<=0xBFFF
@@ -137,6 +162,8 @@ def main():
             'left_transition_cpu':left,'right_transition_cpu':right,
             'raw10_11':w16(d,10),'raw12_13':w16(d,12),
             'chr_upload_list_cpu':chr_upload_list,
+            'chr_upload_marker_count':chr_marker_count,
+            'chr_uploads':chr_uploads,
             'text_stream_cpu':text_stream,
             'routine_list_cpu':routine_list,
             'map_stream_bank':2,'map_stream_cpu':map_ptr,'map_rows':6,
@@ -159,6 +186,15 @@ def main():
     assert all(0x8000<=x['chr_upload_list_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['text_stream_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['routine_list_cpu']<=0xBFFF for x in locations)
+    assert sum(len(x['chr_uploads']) for x in locations)==304
+    assert sum(x['chr_upload_marker_count'] for x in locations)==49
+    assert [x['key'] for x in locations if not x['chr_uploads']]==[16]
+    assert all(x['chr_upload_marker_count']==1 for x in locations if x['key']!=16)
+    all_uploads=[u for x in locations for u in x['chr_uploads']]
+    assert sorted(set(u['source_bank'] for u in all_uploads))==[1,2,3,4,6,7,8,9,10,13]
+    assert sum(1 for u in all_uploads if u['count_raw']==0)==61
+    assert sum(1 for u in all_uploads if u['target_half_raw']==1)==84
+    assert sum(1 for u in all_uploads if u['target_half_raw']==0)==220
     assert bs(prg,FIXED_BANK,0xC6C4,0x75).find(bytes.fromhex('b1bd'))>=0
     assert bs(prg,FIXED_BANK,0xC6C4,0x75).find(bytes.fromhex('2084de'))>=0
     assert bs(prg,FIXED_BANK,0xF08B,0x20).startswith(bytes.fromhex('a9068d10c0adbd03'))
@@ -195,6 +231,11 @@ def main():
             'bytes_per_cell_definition':17,
             'tile_matrix':'first 16 bytes form a 4x4 8x8-tile matrix; C96C selects one column using fine X and offsets 0,4,8,12',
             'raw17':'separate byte consumed by C96C; semantic name intentionally withheld until its PPU/runtime role is proven',
+        },
+        'chr_upload_summary':{
+            'entry_count':304,'single_switch_marker_locations':49,'empty_location_keys':[16],
+            'count_zero_fa58_entries':61,'de84_entries':243,
+            'target_half_raw_counts':{'1':84,'0':220},
         },
         'descriptor_fields_proven':{
             'bytes_14_15':'CHR upload-list pointer consumed by C6C7 and DE84',
