@@ -88,6 +88,22 @@ def main():
             "all_description_addresses_in_cpu_rom_window":all(0x8000 <= r["description_address"] <= 0xffff for r in rs)
         }
 
+    # Record every raw little-endian occurrence of each candidate start,
+    # including surrounding bytes. This separates reproducible byte evidence
+    # from instruction-level proof and helps identify pointer tables/encoded data.
+    for c in filtered:
+        addr=0x8000 + (c["start_prg_offset"] & 0x7fff)
+        needle=bytes((addr & 0xff,(addr>>8)&0xff))
+        hits=[]
+        pos=0
+        while True:
+            pos=prg.find(needle,pos)
+            if pos < 0: break
+            lo=max(0,pos-12); hi=min(len(prg),pos+14)
+            hits.append({"prg_offset":pos,"context_hex":prg[lo:hi].hex()})
+            pos += 1
+        c["raw_pointer_byte_occurrences"]=hits
+
     (out/"persistent_object_candidates.json").write_text(
         json.dumps(filtered,indent=2,ensure_ascii=False),encoding="utf-8")
 if __name__=="__main__": main()
