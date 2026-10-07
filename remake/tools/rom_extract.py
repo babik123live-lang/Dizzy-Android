@@ -73,6 +73,21 @@ def main():
                 refs.append({"prg_offset":i,"opcode":abs_ops[prg[i]],"cpu_address":f"0x{cpu_addr:04X}"})
         c["absolute_6502_refs"]=refs
         c["verified_by_code_reference"]=bool(refs)
+    # Add structural evidence without promoting candidates to verified data.
+    # Addresses in fields 4/5 and 7/8 consistently land in the CPU ROM window;
+    # this is useful evidence for reverse engineering, but still not semantic proof.
+    for c in filtered:
+        rs=c["records"]
+        c["structure"]={
+            "area_ids":sorted(set(r["area_id"] for r in rs)),
+            "sprite_address_min":min(r["sprite_address"] for r in rs),
+            "sprite_address_max":max(r["sprite_address"] for r in rs),
+            "description_address_min":min(r["description_address"] for r in rs),
+            "description_address_max":max(r["description_address"] for r in rs),
+            "all_sprite_addresses_in_cpu_rom_window":all(0x8000 <= r["sprite_address"] <= 0xffff for r in rs),
+            "all_description_addresses_in_cpu_rom_window":all(0x8000 <= r["description_address"] <= 0xffff for r in rs)
+        }
+
     (out/"persistent_object_candidates.json").write_text(
         json.dumps(filtered,indent=2,ensure_ascii=False),encoding="utf-8")
 if __name__=="__main__": main()
