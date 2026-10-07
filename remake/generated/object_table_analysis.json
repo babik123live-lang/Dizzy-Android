@@ -447,5 +447,25 @@
     "key_finding": "The proven bank-13 entry immediately performs indexed-indirect data reads through zero-page pointer $12/$13. This supplies a concrete mechanism by which fixed-bank data can be consumed without any literal F550 operand in the bank-13 code.",
     "implication": "The next decisive target is provenance of zero-page $12/$13 at the EF6C -> B265 call site. If it resolves to F550 (or an offset within F550-F7CF), table access and record semantics can be traced from real code.",
     "aa66_status": "No reachability claim for AA66; literal 50 F5 remains non-evidence until reached by the B265 control-flow graph."
+  },
+  "bank13_trace_correction": {
+    "entry": "B265",
+    "bytes": "EE7507AD7507C91CD005A9008D7507A0FFC8B912B330E8C593D0F6",
+    "correct_decode": [
+      "B265 INC $0775",
+      "B268 LDA $0775",
+      "B26B CMP #$1C",
+      "B26D BNE $B274",
+      "B26F LDA #$00",
+      "B271 STA $0775",
+      "B274 LDY #$FF",
+      "B276 INY",
+      "B277 LDA $B312,Y",
+      "B27A BMI $B264",
+      "B27C CMP $93",
+      "B27E BNE $B276"
+    ],
+    "correction": "Previous report incorrectly decoded B9 12 B3 as LDA ($12),Y. Opcode B9 is absolute,Y, so the real source is table $B312,Y in bank 13. The zero-page $12/$13 pointer hypothesis is withdrawn.",
+    "next": "Trace bank-13 table at B312 and the control flow consuming its entries."
   }
 }
