@@ -1284,5 +1284,40 @@
       "OriginalMapStripComposer.kt"
     ]
   },
-  "text_identity_caution": "RoomCatalog names are UI labels only. ROM runtime identity remains keyed by OriginalLocationCatalog because some text pointers are conditionally reused/adjusted."
+  "text_identity_caution": "RoomCatalog names are UI labels only. ROM runtime identity remains keyed by OriginalLocationCatalog because some text pointers are conditionally reused/adjusted.",
+  "script_object_batch": {
+    "f498": {
+      "count": 100,
+      "meaning": "3-byte records are 16-bit world X plus Y; $87EB makes world X camera-relative and emits a two-tile sprite through $D87F.",
+      "world_x_range": [
+        24,
+        2504
+      ],
+      "y_range": [
+        20,
+        152
+      ],
+      "animation_tiles": [
+        "84/85",
+        "86/87"
+      ],
+      "attributes": [
+        "$01",
+        "$41"
+      ],
+      "catalog": "OriginalScriptSpriteCatalog.kt"
+    },
+    "f4c1": {
+      "count": 4,
+      "meaning": "5-byte records are world-X start/end plus one raw parameter; $BB38 tests player X inside [start,end).",
+      "catalog": "OriginalScriptRangeGateCatalog.kt"
+    },
+    "priority_rules": {
+      "count": 26,
+      "below_threshold": 23,
+      "at_or_above_threshold": 3,
+      "behavior": "F46F/F492 select bank 8 and set NES sprite attribute bit $20 for qualifying OAM entries.",
+      "catalog": "OriginalSpritePriorityRuleCatalog.kt"
+    }
+  }
 }
