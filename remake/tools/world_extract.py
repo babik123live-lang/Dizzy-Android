@@ -79,6 +79,13 @@ def main():
     assert bs(prg,0,0x83AA,11)==bytes.fromhex('addd03851cadde03851d20')
     assert bs(prg,0,0x83D8,11)==bytes.fromhex('addf03851cade003851d20')
 
+    # C8C2 selects bank 2 for the map stream; C96C indexes 17-byte metatile definitions.
+    assert bs(prg,FIXED_BANK,0xC938,12)==bytes.fromhex('a90085378528a9028d0cc020')
+    assert bs(prg,FIXED_BANK,0xC96C,31).startswith(bytes.fromhex('a437b9f503d004a000b122a000841d851c0a261d0a261d0a261d0a261d18'))
+    assert bytes.fromhex('651c851c9002e61d18655e851c') in bs(prg,FIXED_BANK,0xC96C,55)
+    assert bytes.fromhex('a51b205cd5') in bs(prg,FIXED_BANK,0xC990,32)
+    assert bs(prg,FIXED_BANK,0xD55C,5)==bytes.fromhex('aa9d0ac060')
+
     counts=star_counts(prg)
     assert sum(counts.values())==210
     assert counts[16]==0
@@ -87,10 +94,18 @@ def main():
     locations=[]; normal_edges=[]; special_dests=set(); all_transition_ptrs=set()
     for key,ptr in enumerate(ptrs):
         d=bs(prg,1,ptr,DESCRIPTOR_SIZE)
-        width=d[0]; left=w16(d,5); right=w16(d,7); map_ptr=w16(d,20)
+        width=d[0]; metatile_base=w16(d,3); metatile_bank=d[9]
+        left=w16(d,5); right=w16(d,7); map_ptr=w16(d,20)
         assert 1<=width<=96
+        assert 0<=metatile_bank<=14
+        assert 0x8000<=metatile_base<=0xBFFF
         assert 0xC000<=left<=0xFFFF and 0xC000<=right<=0xFFFF
         assert 0x8000<=map_ptr<=0xBFFF
+        grid=list(bs(prg,2,map_ptr,width*6))
+        assert len(grid)==width*6
+        used=sorted(set(grid))
+        assert metatile_base + max(used)*17 + 16 <= 0xBFFF
+        metatiles={str(cell):bs(prg,metatile_bank,metatile_base+cell*17,17).hex() for cell in used}
         lrows=transition_table(prg,left); rrows=transition_table(prg,right)
         assert lrows[-1]['threshold_x']==0xFFFF
         assert rrows[-1]['threshold_x']==0xFFFF
@@ -105,11 +120,14 @@ def main():
         all_transition_ptrs|={left,right}
         locations.append({
             'key':key,'descriptor_cpu':ptr,'width_columns_32px':width,
-            'world_origin_raw':w16(d,1),'raw_3_4':w16(d,3),
+            'world_origin_raw':w16(d,1),
+            'metatile_base_cpu':metatile_base,'metatile_bank':metatile_bank,
             'left_transition_cpu':left,'right_transition_cpu':right,
-            'raw9':d[9],'raw10_11':w16(d,10),'raw12_13':w16(d,12),
+            'raw10_11':w16(d,10),'raw12_13':w16(d,12),
             'raw14_15':w16(d,14),'raw16_17':w16(d,16),'raw18_19':w16(d,18),
-            'map_stream_cpu':map_ptr,'main_star_count':counts[key],
+            'map_stream_bank':2,'map_stream_cpu':map_ptr,'map_rows':6,
+            'map_cell_count':len(grid),'used_cell_ids':used,'map_cells':grid,
+            'metatiles_17_bytes':metatiles,'main_star_count':counts[key],
             'left':lrows,'right':rrows,
         })
 
@@ -120,6 +138,10 @@ def main():
     assert len(normal_edges)==67
     assert special_dests=={50,51,122,123,124,125,126,127,255}
     assert sum(x['main_star_count'] for x in locations)==210
+    assert sum(x['map_cell_count'] for x in locations)==12018
+    assert all(x['map_rows']==6 and x['map_cell_count']==x['width_columns_32px']*6 for x in locations)
+    assert all(x['map_stream_bank']==2 for x in locations)
+    assert set(x['metatile_bank'] for x in locations)=={3,4,5,9}
     assert [x['key'] for x in locations]==list(range(50))
     assert locations[0]['descriptor_cpu']==0xA882
     assert locations[16]['descriptor_cpu']==0xB615
