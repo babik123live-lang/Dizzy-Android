@@ -418,5 +418,14 @@
     "finding": "The fixed bank contains a systematic family of immediate-value stores into C00A..C017-like addresses. This is stronger evidence of a bank/trampoline mechanism than treating arbitrary >=8000 stores as mapper writes. Bank value 13 is explicitly present in the family (A9 0D / STA C017 at about EF6C).",
     "caution": "The exact hardware/software role of these C00x addresses is not yet assigned; they may be RAM-backed bank-call state/trampoline data rather than direct mapper registers.",
     "bank13_status": "Selection/value 13 is now evidenced in reachable fixed-bank neighborhood, but reachability from that mechanism to bank13 candidate AA66 still needs instruction-level tracing."
+  },
+  "bank13_execution": {
+    "select_site": "EF6C",
+    "select_value": 13,
+    "call_target": "B265",
+    "restore_value": 0,
+    "entry_prg_offset": 225893,
+    "candidate_cpu": "AA66",
+    "candidate_status": "not yet reachable from proven B265 entry"
   }
 }
