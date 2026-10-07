@@ -884,5 +884,26 @@
     "group": "B312[row] matched to $93 before rendering",
     "active": "FC17 bit gate",
     "frame": "FCA2 animation sequence 4F,50,51,52,51,50,4F selected by $0775/4"
+  },
+  "sprite_210_semantics": {
+    "proven": [
+      "210 rows describe placements of the same animated 4-frame sprite family selected from tiles 0x4F..0x52",
+      "B312 is the placement-group key matched against runtime $93",
+      "B3E5/B4B8 is horizontal world placement; subtracting $03BB/$03BC yields OAM X",
+      "B58B is OAM Y",
+      "FC17 packed bits enable/disable individual placements at runtime"
+    ],
+    "consequence": "This is now a concrete sprite-placement dataset, not a generic four-column lookup table.",
+    "remaining_identity": "Need CHR-RAM upload/decompression provenance for tile indices 0x4F..0x52 to identify what the animated sprite depicts."
+  },
+  "next_graphics_trace": {
+    "targets": [
+      "find writes/uploads that populate CHR-RAM tiles 0x4F..0x52",
+      "trace source graphics bytes/decompressor",
+      "reconstruct the four 8x8 tile images",
+      "identify whether D87F emits one hardware sprite or participates in a multi-sprite metasprite",
+      "then map placement dataset into native HD scene data"
+    ],
+    "guardrail": "Do not infer visual identity from tile numbers alone."
   }
 }
