@@ -8,6 +8,8 @@ fun main() {
     check(OriginalObjectCatalog.RECORD_COUNT == 64)
     check(OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 259408)
     check(OriginalObjectCatalog.TABLE_END_EXCLUSIVE_PRG_OFFSET == 260048)
+    check(OriginalObjectCatalog.TABLE_END_EXCLUSIVE_PRG_OFFSET - OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 640)
+    check(OriginalObjectCatalog.RECORD_COUNT * com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 640)
     check(all.size == 64)
     check(all.map { it.raw6 }.toSet() == (0..31).toSet())
     check(all.map { it.raw9 }.toSet() == (0..7).toSet())
