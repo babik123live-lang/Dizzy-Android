@@ -652,5 +652,19 @@
       ]
     },
     "next": "Trace RAM $4E/$4F and $11 feeding routine 866B to identify the physical/gameplay meaning of the runtime base."
+  },
+  "runtime_base_inputs": {
+    "routine": "bank0 $866B-$8695",
+    "input_11": "low three bits are copied into low byte of $03BB before further arithmetic",
+    "input_4e_4f": "used as a 16-bit runtime operand during the shift/add sequence that builds $03BB/$03BC",
+    "interpretation_status": "unassigned",
+    "constraint": "Because only $11&7 seeds the low bits while $4E/$4F drives the larger-scale term, the computed base has a coarse component from $4E/$4F plus a 0..7 fine component from $11.",
+    "consequence_for_bank13": "The 210-entry value16 column is compared against this coarse+fine runtime base; this is consistent with spatial/window indexing but is not sufficient to name coordinates.",
+    "next_checks": [
+      "find all reachable writers of $4E/$4F",
+      "find all reachable writers of $11",
+      "identify callers of $866B",
+      "correlate caller state with RAM $93 used by bank13 B265"
+    ]
   }
 }
