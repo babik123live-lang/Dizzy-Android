@@ -44,7 +44,7 @@ jobs:
             adb shell am force-stop com.dizzy.remake
             adb shell am start -W -n com.dizzy.remake/.MainActivity
             sleep 5
-            if [ -z "$(adb shell pidof com.dizzy.remake | tr -d '\r')" ]; then echo "APP_EXITED"; adb logcat -d | tail -n 500; exit 1; fi
+            if [ -z "$(adb shell pidof com.dizzy.remake | tr -d '\r')" ]; then echo "APP_EXITED"; adb logcat -d | grep -Ei "dizzy|AndroidRuntime|ActivityManager|ActivityTaskManager|am_crash|FATAL EXCEPTION" | tail -n 600; exit 1; fi
             adb shell dumpsys activity activities | grep -E "mResumedActivity|topResumedActivity" | grep "com.dizzy.remake" >/dev/null
             adb shell pidof com.dizzy.remake
 
