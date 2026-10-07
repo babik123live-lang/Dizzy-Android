@@ -107,6 +107,14 @@ def main():
         stars.append({'id':i,'layout':'horizontal','group_raw':key,
                       'world_axis':wx,'fixed_axis':y,'state_bit':i})
     assert bank_byte(prg,13,0xB312+MAIN_COUNT)==0xFF
+    keys=[s['group_raw'] for s in stars]
+    assert keys==sorted(keys)
+    assert min(keys)==0 and max(keys)==49
+    assert len(set(keys))==49 and 16 not in set(keys)
+    assert min(s['world_axis'] for s in stars)==38
+    assert max(s['world_axis'] for s in stars)==2828
+    assert min(s['fixed_axis'] for s in stars)==12
+    assert max(s['fixed_axis'] for s in stars)==161
 
     for bank,addr,count,start,label in [(10,0x8F43,10,210,'vertical_a'),
         (13,0x8CFE,20,220,'vertical_b'),(14,0x9260,10,240,'vertical_c')]:
@@ -117,6 +125,16 @@ def main():
                           'fixed_axis':x,'state_bit':start+n})
 
     assert len(stars)==250 and [s['id'] for s in stars]==list(range(250))
+
+    # Exact pickup paths and transition-key provenance.
+    assert bank_bytes(prg,13,0xB2B4,11)==bytes.fromhex('a51e38e5a2186914c920b0')
+    assert bank_bytes(prg,13,0xB2C0,11)==bytes.fromhex('a51f38e5a318691ec910b0')
+    assert bank_bytes(prg,10,0x8F00,24)==bytes.fromhex('e5a2c9e4b004c90ab02ca51d38e5a3c9ecb004c914b01f')
+    assert bank_bytes(prg,14,0x921A,26)==bytes.fromhex('a51c38e5a2c9ecb004c914b02ca51d38e5a3c9ecb004c914b01f')
+    assert bank_bytes(prg,15,0xC748,12)==bytes.fromhex('a000b11c851ec8b11c851fc8')
+    assert bank_bytes(prg,0,0x83B4,14).endswith(bytes.fromhex('608593'))
+    assert bytes.fromhex('2048c7c9ffd00aa90185af60a90085af608593') in bank_bytes(prg,0,0x83D4,0x24)
+
     state_map=list(bank_bytes(prg,FIXED_BANK,0xC200,250))
     assert all(state_map[i]==i//8 for i in range(250))
     assert bank_bytes(prg,FIXED_BANK,0xF8E1,5)==bytes([0xA9,0xFA,0x8D,0x72,0x07])
@@ -130,6 +148,16 @@ def main():
         tb=decoded[i*16:(i+1)*16]
         tiles.append({'tile':tile_id,'raw_hex':tb.hex(),'pixels':pixels_2bpp(tb)})
 
+    group_counts={str(k):sum(1 for s in stars[:210] if s['group_raw']==k) for k in sorted(set(keys))}
+    mechanics={
+        'location_key_ram':'0x93',
+        'location_key_proof':'transition-table result is stored to RAM 0x93 and the main star table matches against it',
+        'main_pickup_window':{'dx_min':-20,'dx_max':11,'dy_min':-30,'dy_max':-15},
+        'vertical_a_pickup_window':{'dx_min':-28,'dx_max':9,'dy_min':-20,'dy_max':19},
+        'vertical_b_raw_unsigned_window':{'dx_min':0,'dx_max':19,'dy_min':0,'dy_max':19,'player_reference':'RAM 0x84/0x85'},
+        'vertical_c_pickup_window':{'dx_min':-20,'dx_max':19,'dy_min':-20,'dy_max':19},
+        'gate_behavior':'bank 0 checks counter 0x0772 and skips the stargate barrier when it reaches zero'
+    }
     result={'rom_sha256':sha,'identity':'collectible_stars',
         'proof':{'total_stars':250,'main_horizontal_count':210,
         'vertical_counts':[10,20,10],'counter_ram':'0x0772','counter_initial':250,
@@ -137,7 +165,7 @@ def main():
         'alternate_animation_tiles':alt_anim,'graphics_resource_id':23,
         'alternate_graphics_resource_id':22},
         'graphics_resource':star_res,'alternate_graphics_resource':alt_res,
-        'tiles':tiles,'stars':stars}
+        'group_counts':group_counts,'mechanics':mechanics,'tiles':tiles,'stars':stars}
     out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
     (out/'star_manifest.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     (out/'graphics_resources.json').write_text(json.dumps(resources,indent=2),encoding='utf-8')
