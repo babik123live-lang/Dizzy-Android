@@ -467,5 +467,18 @@
     ],
     "correction": "Previous report incorrectly decoded B9 12 B3 as LDA ($12),Y. Opcode B9 is absolute,Y, so the real source is table $B312,Y in bank 13. The zero-page $12/$13 pointer hypothesis is withdrawn.",
     "next": "Trace bank-13 table at B312 and the control flow consuming its entries."
+  },
+  "b312": {
+    "offset": 226066,
+    "count": 210,
+    "end_marker": 255,
+    "min": 0,
+    "max": 49,
+    "missing": [
+      16
+    ],
+    "sorted": true,
+    "usage": "B265 scans this table with Y and compares entries to RAM 93",
+    "status": "group lookup; semantic label not assigned"
   }
 }
