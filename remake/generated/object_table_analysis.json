@@ -631,5 +631,26 @@
     "implication": "The branch tests whether the high byte of the signed/modular 16-bit difference is zero. Only values whose difference from $03BB/$03BC lies in 0..255 continue to the B58B[Y] path.",
     "fourth_column": "B58B[Y] is then loaded and transferred to Y before JSR $1F84.",
     "caution": "This proves a range/window comparison against a 16-bit runtime base, but does not yet identify the physical meaning of either quantity."
+  },
+  "runtime_base_03bb_03bc": {
+    "writer_bank": 0,
+    "writes": [
+      "866B: LDA #$00; STA $03BC",
+      "8670: LDA $11; AND #$07; STA $03BB",
+      "8693: CLC; ADC $03BB; STA $03BB"
+    ],
+    "derivation": "$03BC is initialized to 0. $03BB starts as the low 3 bits of RAM $11, then is incremented by a value computed through repeated ASL/ROL of $03BC and arithmetic using $4E/$4F.",
+    "important_result": "$03BB/$03BC is not an arbitrary pointer loaded from ROM. It is a runtime-computed 16-bit quantity.",
+    "rom_validation": {
+      "sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+      "direct_sta_03bb_offsets": [
+        1650,
+        1691
+      ],
+      "direct_sta_03bc_offsets": [
+        1643
+      ]
+    },
+    "next": "Trace RAM $4E/$4F and $11 feeding routine 866B to identify the physical/gameplay meaning of the runtime base."
   }
 }
