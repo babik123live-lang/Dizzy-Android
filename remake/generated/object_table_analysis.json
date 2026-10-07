@@ -381,5 +381,42 @@
       "trace bank 13 only if selection of bank 13 is proven"
     ],
     "safety_rule": "Do not promote the bank-13 F550 pair to a code reference until bank selection, reachability and instruction alignment are all proven."
+  },
+  "mapper_write_batch": {
+    "fixed_bank_store_patterns": {
+      "C00A": {
+        "count": 20,
+        "immediate_value_observed": 0
+      },
+      "C00B": {
+        "count": 12,
+        "immediate_value_observed": 1
+      },
+      "C00C": {
+        "count": 4,
+        "immediate_value_observed": 2
+      }
+    },
+    "additional_fixed_bank_examples": [
+      {
+        "cpu": "0xEE4B",
+        "sequence": "A9 0C 8D 16 C0"
+      },
+      {
+        "cpu": "0xEE88",
+        "sequence": "A9 09 8D 13 C0"
+      },
+      {
+        "cpu": "0xEF00",
+        "sequence": "A9 0B 8D 15 C0"
+      },
+      {
+        "cpu": "0xEF6C",
+        "sequence": "A9 0D 8D 17 C0"
+      }
+    ],
+    "finding": "The fixed bank contains a systematic family of immediate-value stores into C00A..C017-like addresses. This is stronger evidence of a bank/trampoline mechanism than treating arbitrary >=8000 stores as mapper writes. Bank value 13 is explicitly present in the family (A9 0D / STA C017 at about EF6C).",
+    "caution": "The exact hardware/software role of these C00x addresses is not yet assigned; they may be RAM-backed bank-call state/trampoline data rather than direct mapper registers.",
+    "bank13_status": "Selection/value 13 is now evidenced in reachable fixed-bank neighborhood, but reachability from that mechanism to bank13 candidate AA66 still needs instruction-level tracing."
   }
 }
