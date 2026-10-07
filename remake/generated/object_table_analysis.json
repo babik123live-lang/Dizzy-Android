@@ -1181,5 +1181,42 @@
       "fixed_axis_min": 12,
       "fixed_axis_max": 161
     }
+  },
+  "world_layout_batch": {
+    "locations": 50,
+    "selector": "RAM $93; C500 indexes bank-1 pointer table at $8003 + 2*$93",
+    "descriptor_size_used": 22,
+    "horizontal_world_x": "RAM $9C/$9D",
+    "screen_x_edge_tests": "RAM $A3; left below $1C, right at/above $BE with original exceptions",
+    "transition_tables": 83,
+    "normal_transition_edges": 67,
+    "special_destination_values": [
+      50,
+      51,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      255
+    ],
+    "map": {
+      "bank": 2,
+      "rows": 6,
+      "total_cells": 12018,
+      "cell_size_interpretation": "32-pixel columns/blocks; C5D2 divides world X by 32 and C96C indexes 17-byte records",
+      "metatile_record_bytes": 17,
+      "metatile_banks": [
+        3,
+        4,
+        5,
+        9
+      ],
+      "proof": "C938 selects bank 2 before map reads; C96C computes cell*17 + $5E/$5F; $1B selects metatile bank via D55C"
+    },
+    "catalog": "remake/src/core/OriginalLocationCatalog.kt",
+    "extractor": "remake/tools/world_extract.py",
+    "caution": "Legacy RoomCatalog has provisional labels and is not the original $93 location catalog."
   }
 }
