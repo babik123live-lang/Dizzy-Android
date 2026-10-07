@@ -9,6 +9,7 @@ package com.dizzy.remake.core
 object OriginalObjectCatalog {
     const val RECORD_COUNT = 64
     const val TABLE_START_PRG_OFFSET = 259408
+    const val TABLE_CPU_ADDRESS = 0xF550
     const val TABLE_END_EXCLUSIVE_PRG_OFFSET = TABLE_START_PRG_OFFSET + RECORD_COUNT * OriginalObject.BYTE_SIZE
     private val rows = arrayOf(
         intArrayOf(255,50,0,40,32772,0,44357,0),
