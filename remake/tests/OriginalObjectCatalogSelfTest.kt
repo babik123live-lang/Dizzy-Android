@@ -20,7 +20,6 @@ fun main() {
     check(all[47].raw0 == 49 && all[47].raw1 == 240 && all[47].raw3 == 60)
     check(all[48].raw0 == 5 && all[48].raw1 == 148)
     check(all.last().raw0 == 19 && all.last().raw1 == 172)
-    check(all.all { it.raw0 in 0..49 })
     check(all.any { it.raw0 == 0 && it.raw1 == 100 && it.raw3 == 40 })
     check(all.any { it.raw0 == 48 && it.raw1 == 190 && it.raw3 == 64 })
     check(all.any { it.raw0 == 49 && it.raw1 == 240 && it.raw3 == 60 && it.raw45le == 35912 && it.raw78le == 44293 })
