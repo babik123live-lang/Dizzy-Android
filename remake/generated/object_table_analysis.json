@@ -223,5 +223,63 @@
   },
   "corrections": [
     "Previous 62-record start at 259428 was too late by 20 bytes. Correct structural span is 64 records starting at 259408."
-  ]
+  ],
+  "deep_batch_3": {
+    "verified_span": {
+      "start": 259408,
+      "end_exclusive": 260048,
+      "bytes": 640,
+      "records": 64,
+      "record_size": 10
+    },
+    "leading_records": [
+      {
+        "index": 0,
+        "hex": "ff32002804800045ad00",
+        "decoded_raw": [
+          255,
+          50,
+          0,
+          40,
+          32772,
+          0,
+          44357,
+          0
+        ]
+      },
+      {
+        "index": 1,
+        "hex": "ff32002804800045ad00",
+        "decoded_raw": [
+          255,
+          50,
+          0,
+          40,
+          32772,
+          0
+        ]
+      }
+    ],
+    "structural_checks": {
+      "byte_length_matches": true,
+      "leading_records_identical": true,
+      "recovered_raw0_49_index": 47,
+      "record_after_recovered_index": 48,
+      "raw6_domain": "0..31 complete",
+      "raw9_domain": "0..7 complete",
+      "table_end_exclusive": 260048
+    },
+    "code_boundary_before_table": {
+      "last_instruction_offset": 259407,
+      "last_instruction": "RTS",
+      "implication": "data begins immediately after an executable routine return"
+    },
+    "next_reverse_engineering_targets": [
+      "prove how code obtains the table base rather than relying only on absolute opcode-shaped hits",
+      "trace loop/index arithmetic to establish record stride usage",
+      "identify which raw fields are coordinates, IDs, flags or addresses",
+      "map mapper-71 bank state before interpreting raw45le/raw78le as CPU pointers"
+    ],
+    "status": "64-record byte span structurally established; field semantics not yet established"
+  }
 }
