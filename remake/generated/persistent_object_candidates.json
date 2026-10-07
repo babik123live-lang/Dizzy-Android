@@ -732,5 +732,23 @@
       }
     ],
     "correction": "The previous opcode whitelist omitted AND abs,X (0x3D). $F564 does have a direct 6502 code reference and is stronger evidence than $F730."
+  },
+  "gap_analysis": {
+    "first_run_last_record_offset": 259868,
+    "gap_offset": 259878,
+    "gap_length": 10,
+    "gap_hex": "31f0003c488c1305ad00",
+    "decoded_as_same_10_byte_layout": {
+      "area_id": 49,
+      "x": 240,
+      "sub_area_id": 0,
+      "y": 60,
+      "sprite_address": 35912,
+      "interaction_id": 19,
+      "description_address": 44293,
+      "interaction_sub_id": 0
+    },
+    "next_run_offset": 259888,
+    "conclusion": "The 10-byte gap is structurally another record. It was excluded only because the scanner capped area_id at 48. Therefore the apparent 45+16 split is an artifact of the heuristic; offsets 259428..260047 form 62 consecutive 10-byte records."
   }
 }
