@@ -1,0 +1,102 @@
+{
+  "source_rom_sha256": "bb6d2b7f6d2eeb216be0c428c1aa45e21a213565b60214dd8d130b8c5eb0cfb1",
+  "table": {
+    "prg_start": 259428,
+    "prg_end_exclusive": 260048,
+    "record_size": 10,
+    "record_count": 62
+  },
+  "recovered_record_45_hex": "31f0003c488c1305ad00",
+  "field_profiles": [
+    {
+      "offset": 0,
+      "min": 0,
+      "max": 49,
+      "unique": 32
+    },
+    {
+      "offset": 1,
+      "min": 4,
+      "max": 250,
+      "unique": 54
+    },
+    {
+      "offset": 2,
+      "min": 0,
+      "max": 10,
+      "unique": 10
+    },
+    {
+      "offset": 3,
+      "min": 30,
+      "max": 240,
+      "unique": 29
+    },
+    {
+      "offset": 4,
+      "min": 5,
+      "max": 252,
+      "unique": 42
+    },
+    {
+      "offset": 5,
+      "min": 128,
+      "max": 170,
+      "unique": 39,
+      "note": "high byte always 0x80..0xAA"
+    },
+    {
+      "offset": 6,
+      "min": 0,
+      "max": 31,
+      "unique": 32,
+      "note": "all values 0..31 occur"
+    },
+    {
+      "offset": 7,
+      "min": 5,
+      "max": 247,
+      "unique": 53
+    },
+    {
+      "offset": 8,
+      "min": 172,
+      "max": 189,
+      "unique": 18,
+      "note": "high byte always 0xAC..0xBD"
+    },
+    {
+      "offset": 9,
+      "min": 0,
+      "max": 7,
+      "unique": 8,
+      "note": "all values 0..7 occur"
+    }
+  ],
+  "code_references": [
+    {
+      "target": "0xF564",
+      "prg_opcode_offset": 99827,
+      "instruction": "AND $F564,X",
+      "bytes": "3d64f5",
+      "status": "confirmed instruction"
+    },
+    {
+      "target": "0xF56A",
+      "prg_opcode_offset": 78147,
+      "instruction": "EOR $F56A",
+      "status": "unrelated until control flow proves otherwise"
+    }
+  ],
+  "boundary": {
+    "next_prg_offset": 260048,
+    "next_bytes_hex": "c5a3f009b02a18691ac5a39024a52038e909a8a521e900c59dd002c49cb011",
+    "note": "62 records are contiguous; exact semantic boundary still needs control-flow proof"
+  },
+  "conclusions": [
+    "The 62x10-byte span is reproducible byte-for-byte from the supplied ROM.",
+    "The first candidate address has a real indexed 6502 reference.",
+    "Field semantics remain intentionally unassigned.",
+    "Bytes 4/5 and 7/8 look pointer-like by range, but mapper/bank semantics must be established before naming them pointers."
+  ]
+}
