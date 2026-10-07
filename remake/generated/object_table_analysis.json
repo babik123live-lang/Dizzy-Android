@@ -886,15 +886,13 @@
     "frame": "FCA2 animation sequence 4F,50,51,52,51,50,4F selected by $0775/4"
   },
   "sprite_210_semantics": {
-    "proven": [
-      "210 rows describe placements of the same animated 4-frame sprite family selected from tiles 0x4F..0x52",
-      "B312 is the placement-group key matched against runtime $93",
-      "B3E5/B4B8 is horizontal world placement; subtracting $03BB/$03BC yields OAM X",
-      "B58B is OAM Y",
-      "FC17 packed bits enable/disable individual placements at runtime"
+    "correction": "The 210-row table is the main horizontally-scrolled subset of the game's 250 collectible stars, not the complete set.",
+    "extra_sets": [
+      "10 stars: IDs 210-219",
+      "20 stars: IDs 220-239",
+      "10 stars: IDs 240-249"
     ],
-    "consequence": "This is now a concrete sprite-placement dataset, not a generic four-column lookup table.",
-    "remaining_identity": "Need CHR-RAM upload/decompression provenance for tile indices 0x4F..0x52 to identify what the animated sprite depicts."
+    "result": "All 250 collectible-star state bits and placement records are now accounted for."
   },
   "next_graphics_trace": {
     "targets": [
@@ -989,23 +987,10 @@
     "target": "Prove which writer reaches PPU pattern addresses $04F0-$052F and identify its source bytes."
   },
   "chr_upload_breakthrough": {
-    "routine": "$DE84",
-    "proven": "Generic CHR-RAM uploader. It stores source pointer X/Y in $2C/$2D, multiplies A by 16, constructs a PPU pattern address, then $DEA6+ streams bytes through $2007.",
-    "important_correction": "For this call form the high-byte accumulator is seeded with 1 before four shifts. Therefore tile N targets PPU $1000 + 16*N, not $0000 + 16*N.",
-    "target_tiles": {
-      "50": "PPU $1500-$150F",
-      "51": "PPU $1510-$151F",
-      "52": "PPU $1520-$152F",
-      "4F": "PPU $14F0-$14FF"
-    },
-    "evidence": [
-      "$DE9F/$DEA2 write computed high/low address to $2006",
-      "$DEC4 writes source bytes to $2007",
-      "16-byte inner count corresponds to one NES 2bpp tile",
-      "$C706 is a real caller of $DE84 in fixed-bank code"
-    ],
-    "consequence": "The previous $04F0-$052F target range was wrong by $1000. The animated OAM tiles live in pattern table 1.",
-    "next": "Trace the $DE84 call that receives tile IDs 4F-52 and recover its X/Y source pointer; then decode the exact 64 source bytes."
+    "correction": "DE84 captures carry on entry to select the pattern-table high bit; it is not hardwired to pattern table 1.",
+    "star_resource": "Descriptor 23: bank 7 source $B33C, destination tile $4F, four tiles, pattern table 0.",
+    "decoded_end": "$B380",
+    "animation": "$4F,$50,$51,$52,$51,$50,$4F"
   },
   "de84_decoder": {
     "exact_register_contract": "A selects destination tile/address; X/Y are source pointer; RAM $32 is outer block count.",
@@ -1071,5 +1056,22 @@
       "$DE78 uses CLC before $DE84",
       "$C706 inherits carry from LSR $37"
     ]
+  },
+  "star_identity_proven": {
+    "total": 250,
+    "evidence": [
+      "RAM $0772 is initialized to $FA (250) and decremented on collection through $FC60.",
+      "The main B312/B3E5/B4B8/B58B structure supplies star IDs 0..209.",
+      "Three additional placement loops use IDs 210..219, 220..239 and 240..249.",
+      "All four paths use the same animation sequence $4F,$50,$51,$52,$51,$50,$4F and the same packed state bit machinery.",
+      "Resource descriptor 23 loads exactly four tiles at $4F..$52 into sprite pattern table 0."
+    ],
+    "counts": {
+      "main_horizontal": 210,
+      "vertical_a": 10,
+      "vertical_b": 20,
+      "vertical_c": 10
+    },
+    "packed_state": "$0751-$0770 = 32 bytes; $C200[id] equals floor(id/8), mask selected by id&7."
   }
 }
