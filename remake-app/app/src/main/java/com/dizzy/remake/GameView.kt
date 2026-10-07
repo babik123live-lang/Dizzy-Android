@@ -10,13 +10,15 @@ import kotlin.math.sin
 class GameView(context: Context) : View(context) {
     private val clock = FixedStepClock()
     private val input = InputState()
-    private val scene = RemasterScenes.opening()
+    private var scene = RemasterScenes.opening()
     private val world = World(scene.room, Player(128f, 150f))
     private val engine = Engine(world, input)
     private val viewport = Viewport()
     private val p = Paint(Paint.ANTI_ALIAS_FLAG)
     private var running = false
-    private var t = 0f\n    private val audio = RemasterAudio()\n    private var lastA = false
+    private var t = 0f
+    private val audio = RemasterAudio()
+    private var lastA = false
 
     private val frame = object : Runnable {
         override fun run() {
