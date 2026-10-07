@@ -609,5 +609,27 @@
     "finding": "All four columns contain exactly 210 payload bytes followed by FF at aligned boundaries. This proves a 210-row four-column data structure indexed by the same Y.",
     "arithmetic": "B3E5,Y is low byte and B4B8,Y participates as high byte in SEC/SBC against 03BB/03BC, so columns 1+2 form a 16-bit little-endian quantity in the executed code.",
     "caution": "The meaning of that 16-bit quantity and the fourth column is still intentionally unnamed."
+  },
+  "bank13_16bit_column_analysis": {
+    "formula": "value16 = B3E5[Y] + 256*B4B8[Y]",
+    "range": [
+      21,
+      3032
+    ],
+    "first_values": [
+      352,
+      44,
+      60,
+      304,
+      60,
+      277,
+      164,
+      429
+    ],
+    "executed_operation": "SEC; LDA low[Y]; SBC $03BB; STA $1E; LDA high[Y]; SBC $03BC",
+    "result": "The code computes value16 - word($03BB,$03BC). Low-byte result is stored in $1E; high-byte result remains in A and is tested with BNE.",
+    "implication": "The branch tests whether the high byte of the signed/modular 16-bit difference is zero. Only values whose difference from $03BB/$03BC lies in 0..255 continue to the B58B[Y] path.",
+    "fourth_column": "B58B[Y] is then loaded and transferred to Y before JSR $1F84.",
+    "caution": "This proves a range/window comparison against a 16-bit runtime base, but does not yet identify the physical meaning of either quantity."
   }
 }
