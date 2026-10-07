@@ -2,9 +2,9 @@ package com.dizzy.remake.core
 
 /**
  * ROM-derived persistent-object records. These are data records, not guessed
- * scene geometry. areaId is the original area; subAreaId is retained exactly
- * as stored by the game and must not be treated as a RoomCatalog id without
- * further verification.
+ * scene geometry. Field meanings are provisional: the first and third bytes
+ * are retained as raw ROM values and must not be treated as RoomCatalog ids
+ * until the original loader code proves their semantics.
  */
 object OriginalObjectCatalog {
     private val rows = arrayOf(
@@ -76,5 +76,6 @@ object OriginalObjectCatalog {
         OriginalObject(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7])
     }
 
-    fun inArea(areaId:Int): List<OriginalObject> = all.filter { it.areaId == areaId }
+    /** Provisional raw-field filter; do not use this to drive room layout yet. */
+    fun inArea(rawFirstField:Int): List<OriginalObject> = all.filter { it.areaId == rawFirstField }
 }
