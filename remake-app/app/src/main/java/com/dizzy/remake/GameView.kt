@@ -19,6 +19,7 @@ class GameView(context: Context) : View(context) {
     private var t = 0f
     private val audio = RemasterAudio()
     private var lastA = false
+    private var currentRoom = 0
 
     private val frame = object : Runnable {
         override fun run() {
@@ -374,7 +375,9 @@ class GameView(context: Context) : View(context) {
     override fun onTouchEvent(e: MotionEvent): Boolean {
         val down=e.actionMasked!=MotionEvent.ACTION_UP&&e.actionMasked!=MotionEvent.ACTION_CANCEL
         if(!down){input.left=false;input.right=false;input.a=false;lastA=false;return true}
-        input.left=e.x<width*.18f; input.right=e.x>=width*.18f&&e.x<width*.36f; input.a=e.x>width*.72f\n        if(input.a && !lastA) audio.jump()\n        lastA=input.a
+        input.left=e.x<width*.18f; input.right=e.x>=width*.18f&&e.x<width*.36f; input.a=e.x>width*.72f
+        if(input.a && !lastA) audio.jump()
+        lastA=input.a
         return true
     }
 }
