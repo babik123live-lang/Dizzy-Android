@@ -1,28 +1,12 @@
 {
-  "star_plant": {
-    "file_offset": 260918,
-    "prg_offset": 260902,
-    "area_id": 15,
-    "x": 47,
-    "sub_area_id": 8,
-    "y": 158,
-    "sprite_address": 35683,
-    "interaction_id": 2,
-    "description_address": 33480,
-    "interaction_sub_id": 3,
-    "raw": "0F 2F 08 9E 63 8B 02 C8 82 03"
+  "status": "reference-only",
+  "reason": "The object-record examples documented by FantasticAdventuresOfDizzyFair do not occur at those offsets in the supplied Europe En/Fr/De ROM. They must not be treated as decoded objects for this ROM.",
+  "external_examples": {
+    "star_plant": "0F 2F 08 9E 63 8B 02 C8 82 03",
+    "plank": "0E F4 01 A8 5E A5 1D F4 83 00"
   },
-  "plank": {
-    "file_offset": 260434,
-    "prg_offset": 260418,
-    "area_id": 14,
-    "x": 244,
-    "sub_area_id": 1,
-    "y": 168,
-    "sprite_address": 42332,
-    "interaction_id": 29,
-    "description_address": 33780,
-    "interaction_sub_id": 0,
-    "raw": "0E F4 01 A8 5C A5 1D F4 83 00"
+  "supplied_rom_bytes_at_documented_offsets": {
+    "0x03F736": "31 F0 00 3C 48 8C 13 05 AD 00",
+    "0x03F952": "D5 60 8D D5 03 98 48 8A 48 AC"
   }
 }
