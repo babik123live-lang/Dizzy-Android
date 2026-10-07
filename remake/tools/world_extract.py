@@ -238,13 +238,13 @@ def main():
     assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('b1cb'))>=0
     assert bs(prg,FIXED_BANK,0xF439,0x36).find(bytes.fromhex('6c1c00'))>=0
     # Descriptor bytes 10/11 -> $BB/$BC: 26-byte, 208-bit tile collision mask.
-    assert bs(prg,FIXED_BANK,0xC57A,8)==bytes.fromhex('b15085bbc8b15085bc')
-    assert bs(prg,FIXED_BANK,0xDFF1,15)==bytes.fromhex('b900c2a8b1bba0008c0ac03d00e0')
+    assert bs(prg,FIXED_BANK,0xC57A,9)==bytes.fromhex('b15085bbc8b15085bc')
+    assert bs(prg,FIXED_BANK,0xDFF1,14)==bytes.fromhex('b900c2a8b1bba0008c0ac03d00e0')
     assert bs(prg,FIXED_BANK,0xE000,8)==bytes.fromhex('8040201008040201')
     assert bs(prg,0,0x834B,5)==bytes.fromhex('200ddfd00e')
     assert bs(prg,0,0x8543,5)==bytes.fromhex('200ddfd003')
     # Descriptor bytes 12/13 -> $CD/$CE: room palette-cycle data.
-    assert bs(prg,FIXED_BANK,0xC584,8)==bytes.fromhex('b15085cdc8b15085ce')
+    assert bs(prg,FIXED_BANK,0xC584,9)==bytes.fromhex('b15085cdc8b15085ce')
     assert bs(prg,FIXED_BANK,0xDEE3,14)==bytes.fromhex('a9018d0bc020a0baa9008d0ac060')
     assert bs(prg,1,0xBAA0,13)==bytes.fromhex('a900aecd03f00618690dcad0fa')
     assert bytes.fromhex('a460a5cd18690385cd') in bs(prg,1,0xBAD1,16)
