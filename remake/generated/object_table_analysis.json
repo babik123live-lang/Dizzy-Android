@@ -773,5 +773,23 @@
     ],
     "finding": "The base consumed by B265 already exists before that call. The later 8669 call prepares a future base, not the preceding B265 operation.",
     "selection": "B265 matches RAM 93 against B312, combines B3E5/B4B8 into a 16-bit candidate, subtracts the runtime base, stores the low difference in RAM 1E, and uses B58B as a separate downstream parameter."
-  }
+  },
+  "window_filter_semantics": {
+    "candidate_word": "B3E5[Y] + 256*B4B8[Y]",
+    "base_word": "RAM 03BB + 256*RAM 03BC",
+    "operation": "SEC then low-byte SBC, then high-byte SBC; low result stored in RAM 1E; high result tested",
+    "proven_condition": "The continuing path requires the high byte of the 16-bit modular subtraction result to be zero.",
+    "consequence": "For ordinary non-wrapping candidate>=base cases this means candidate-base is 0..255. RAM 1E is then exactly that offset.",
+    "caution": "Do not generalize this to signed distance or coordinates; modular underflow cases must be handled according to the actual branch path.",
+    "column4": "B58B[Y] is loaded only after the high-byte test succeeds, so it belongs to an accepted row and is not part of the window comparison itself."
+  },
+  "analysis_priorities": [
+    "Trace FC17 return condition",
+    "Trace downstream consumer reached after B58B load",
+    "Find all consumers of RAM 1E",
+    "Find all reachable callers of EF6C sequence",
+    "Correlate RAM 93 assignments with those callers",
+    "Search references to B312/B3E5/B4B8/B58B",
+    "Relate accepted 210-row entries to the 64-record F550 span without assuming IDs"
+  ]
 }
