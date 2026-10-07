@@ -1218,5 +1218,56 @@
     "catalog": "remake/src/core/OriginalLocationCatalog.kt",
     "extractor": "remake/tools/world_extract.py",
     "caution": "Legacy RoomCatalog has provisional labels and is not the original $93 location catalog."
+  },
+  "location_descriptor_layout": {
+    "size": 22,
+    "loader": "$C500",
+    "offsets": {
+      "width_columns32": 0,
+      "world_origin_word": 1,
+      "metatile_base_word": 3,
+      "left_transition_word": 5,
+      "right_transition_word": 7,
+      "metatile_bank": 9,
+      "raw_aux10_word": 10,
+      "raw_aux12_word": 12,
+      "chr_upload_list_word": 14,
+      "text_stream_word": 16,
+      "routine_list_word": 18,
+      "map_stream_word": 20
+    },
+    "proof": "Direct byte-by-byte stores in C500; map pointer is read after Y reaches 20/21."
+  },
+  "location_scripts": {
+    "dispatcher": "$F439",
+    "format": "16-bit handler addresses in bank-1 script data; high byte zero terminates. Dispatcher restores bank 0 before indirect JMP.",
+    "locations": 50,
+    "total_ops": 284,
+    "unique_handlers": 63,
+    "empty_location_keys": [
+      16
+    ],
+    "known_argument_handlers": {
+      "$F498": 3,
+      "$F46F": 1,
+      "$F492": 1,
+      "$F4C1": 5
+    },
+    "high_frequency_handlers": {
+      "$F498": 100,
+      "$896D": 49,
+      "$F46F": 23,
+      "$B882": 9,
+      "$BB6D": 9,
+      "$9E13": 8,
+      "$FBEF": 7,
+      "$BF9B": 7
+    },
+    "extractor": "remake/tools/script_extract.py",
+    "caution": "Routine-list data is bytecode-like: handlers may consume following argument bytes. It must not be parsed as a flat array of 16-bit pointers."
+  },
+  "room_catalog_alignment": {
+    "count": 50,
+    "result": "Polish short labels realigned to runtime location keys 0..49; legacy 49-entry ordering removed."
   }
 }
