@@ -10,17 +10,24 @@ data class RemasterScene(
 )
 
 object RemasterScenes {
-    fun opening(): RemasterScene {
-        val platforms = listOf(
-            ScenePlatform(RectF(0f, 210f, 2048f, 30f), Material.GRASS),
-            ScenePlatform(RectF(235f, 172f, 180f, 12f), Material.WOOD),
-            ScenePlatform(RectF(520f, 146f, 150f, 12f), Material.WOOD),
-            ScenePlatform(RectF(760f, 188f, 230f, 12f), Material.STONE)
-        )
-        return RemasterScene(
-            Room(0, 2048f, 240f, platforms.map { Solid(it.box) }),
-            platforms,
-            RoomCatalog.rooms.first().namePl
-        )
+    private fun scene(id:Int, width:Float, title:String, platforms:List<ScenePlatform>) =
+        RemasterScene(Room(id,width,240f,platforms.map{Solid(it.box)}),platforms,title)
+
+    fun room(id:Int):RemasterScene = when(id) {
+        0 -> scene(0,1024f,RoomCatalog.rooms[0].namePl,listOf(
+            ScenePlatform(RectF(0f,210f,1024f,30f),Material.GRASS),
+            ScenePlatform(RectF(235f,172f,180f,12f),Material.WOOD),
+            ScenePlatform(RectF(520f,146f,150f,12f),Material.WOOD),
+            ScenePlatform(RectF(760f,188f,230f,12f),Material.STONE)
+        ))
+        1 -> scene(1,1024f,RoomCatalog.rooms[1].namePl,listOf(
+            ScenePlatform(RectF(0f,210f,1024f,30f),Material.GRASS),
+            ScenePlatform(RectF(100f,164f,180f,12f),Material.WOOD),
+            ScenePlatform(RectF(390f,135f,210f,12f),Material.WOOD),
+            ScenePlatform(RectF(720f,174f,180f,12f),Material.WOOD)
+        ))
+        else -> error("Room $id not remastered yet")
     }
+
+    fun opening()=room(0)
 }
