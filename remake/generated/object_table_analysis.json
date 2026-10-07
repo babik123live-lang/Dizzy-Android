@@ -730,5 +730,40 @@
     "notable_initialization": "CBD3-CBDC clears $4E, $11 and $4F together (and nearby state), showing these variables belong to mutable runtime state rather than ROM pointers.",
     "notable_93": "E1xx/E2xx contains many immediate assignments to $93, including values 0x1F,0x1D,0x13,0x2E,0x18,0x1E,0x2C,0x22. This supports $93 as an explicit categorical/state value.",
     "correction": "Previous writer summary was qualitative. These are concrete fixed-bank store sites found directly in the verified ROM; reachability of each individual site still requires CFG confirmation."
+  },
+  "base_builder_8669": {
+    "entry": "$8669",
+    "call_site": "fixed bank $EF79: JSR $8669, immediately after bank13 $B265 returns and bank 0 is restored",
+    "exact_steps": [
+      "$03BC=0",
+      "$03BB=$11&7",
+      "$32=$4F&3",
+      "A=$4E-8",
+      "shift A into $03BC twice",
+      "A+=($4F&3)",
+      "shift A into $03BC three more times",
+      "A+=($11&7)",
+      "store A to $03BB"
+    ],
+    "arithmetic": "Before the final fine addition, the constructed 16-bit quantity is 8*(4*($4E-8)+($4F&3)). The final ($11&7) is added only to the low byte; there is no following carry propagation into $03BC.",
+    "significance": "This proves a coarse/fine numeric index with factors 32, 8 and 1. It is computed immediately after the bank13 B265 routine. Coordinate/world semantics are still deliberately unnamed.",
+    "correction": "Routine entry is $8669, not $866B."
+  },
+  "state93_domain": {
+    "immediate_values": [
+      31,
+      29,
+      19,
+      46,
+      24,
+      30,
+      44,
+      34
+    ],
+    "b312_key_domain": [
+      0,
+      49
+    ],
+    "conclusion": "same domain; supports group-key interpretation, not yet room semantics"
   }
 }
