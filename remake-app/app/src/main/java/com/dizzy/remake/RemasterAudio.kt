@@ -18,12 +18,23 @@ class RemasterAudio {
     fun start() {
         if (track != null) return
         val min = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT)
+        try {
         track = AudioTrack.Builder()
             .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
             .setAudioFormat(AudioFormat.Builder().setSampleRate(rate).setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
             .setBufferSizeInBytes((min * 2).coerceAtLeast(8192))
             .setTransferMode(AudioTrack.MODE_STREAM)
             .build().also { it.play() }
+        } catch (_: UnsupportedOperationException) {
+            track = null
+            return
+        } catch (_: IllegalArgumentException) {
+            track = null
+            return
+        } catch (_: IllegalStateException) {
+            track = null
+            return
+        }
         Thread({ pump() }, "DizzyAudio").apply { isDaemon = true; start() }
     }
 
