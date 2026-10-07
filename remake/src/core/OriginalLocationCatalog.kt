@@ -15,6 +15,9 @@ data class OriginalLocationDescriptor(
     val mainStarCount:Int
 ) {
     val widthPx:Int get() = widthColumns32 * 32
+    val collisionMaskCpu:Int get() = OriginalCollisionMaskCatalog.maskCpuForLocation(key)
+    val paletteDataCpu:Int get() = OriginalPaletteCycleCatalog.paletteCpuForLocation(key)
+    fun isBlockedTile(tileId:Int):Boolean = OriginalCollisionMaskCatalog.isBlockedTile(key,tileId)
     fun leftDestination(worldX:Int):Int =
         OriginalTransitionCatalog.resolve(leftTransitionCpu, worldX)
     fun rightDestination(worldX:Int):Int =
