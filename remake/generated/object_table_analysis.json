@@ -765,5 +765,13 @@
       49
     ],
     "conclusion": "same domain; supports group-key interpretation, not yet room semantics"
+  },
+  "pipeline_timing": {
+    "sequence": [
+      "EF71 calls B265",
+      "EF79 calls 8669"
+    ],
+    "finding": "The base consumed by B265 already exists before that call. The later 8669 call prepares a future base, not the preceding B265 operation.",
+    "selection": "B265 matches RAM 93 against B312, combines B3E5/B4B8 into a 16-bit candidate, subtracts the runtime base, stores the low difference in RAM 1E, and uses B58B as a separate downstream parameter."
   }
 }
