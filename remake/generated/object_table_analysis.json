@@ -791,5 +791,42 @@
     "Correlate RAM 93 assignments with those callers",
     "Search references to B312/B3E5/B4B8/B58B",
     "Relate accepted 210-row entries to the 64-record F550 span without assuming IDs"
+  ],
+  "fc17_exact": {
+    "code": [
+      "LDX $0773",
+      "LDY $C200,X",
+      "LDA $0773",
+      "AND #$07",
+      "TAX",
+      "LDA $0751,Y",
+      "AND $F8CF,X",
+      "RTS"
+    ],
+    "meaning": "FC17 is an eligibility/bit test for the candidate row saved in $0773. B265 branches away on zero and performs the numeric window test only when this mask test is nonzero.",
+    "tables": [
+      "$C200 indexed by candidate row",
+      "$F8CF indexed by row modulo 8"
+    ],
+    "runtime": "$0751 indexed through the C200 mapping"
+  },
+  "accepted_row_path": {
+    "steps": [
+      "B58B[Y] -> Y",
+      "Y -> RAM $1F",
+      "#$10 -> RAM $32",
+      "$0775 shifted right twice -> X",
+      "FCA2[X] -> A",
+      "RAM $1E -> X",
+      "JSR $D87F"
+    ],
+    "finding": "B58B is concretely stored in RAM $1F before the downstream renderer/handler path. The within-window offset $1E is passed as X into D87F. This separates row metadata ($1F) from window offset ($1E).",
+    "extra": "After D87F, code compares an expression derived from $1E and RAM $A2 against #$20, adding #$14 before CMP; semantics remain unnamed."
+  },
+  "new_constraints": [
+    "FC17 is not a generic precheck: it is a row-specific bit-mask eligibility gate.",
+    "B58B values are runtime metadata written to $1F.",
+    "$1E is an actual downstream index/offset input, not merely a temporary subtraction byte.",
+    "Do not name D87F as renderer until its body/call effects are traced."
   ]
 }
