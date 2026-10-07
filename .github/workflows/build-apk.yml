@@ -25,6 +25,18 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bundle JSNES 2.0.0
+        working-directory: project/Dizzy-Android-Project
+        run: |
+          mkdir -p .ci
+          npm install --prefix .ci --no-save jsnes@2.0.0
+          cp .ci/node_modules/jsnes/dist/jsnes.min.js app/src/main/assets/jsnes.min.js
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
