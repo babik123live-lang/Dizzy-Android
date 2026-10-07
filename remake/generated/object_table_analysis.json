@@ -1319,5 +1319,29 @@
       "behavior": "F46F/F492 select bank 8 and set NES sprite attribute bit $20 for qualifying OAM entries.",
       "catalog": "OriginalSpritePriorityRuleCatalog.kt"
     }
+  },
+  "collision_and_palette_batch": {
+    "collision": {
+      "descriptor_bytes": "10-11",
+      "runtime_pointer": "$BB/$BC",
+      "tables": 12,
+      "bytes_per_table": 26,
+      "tile_domain": "0..207",
+      "test": "tile N -> byte N>>3, mask 0x80>>(N&7)",
+      "code_path": "C500 -> DF0D/DFA5 -> DFF5",
+      "gameplay_proof": "bank-0 player movement branches on zero/nonzero collision results at $834B/$8359 and $8543",
+      "catalog": "OriginalCollisionMaskCatalog.kt"
+    },
+    "palette": {
+      "descriptor_bytes": "12-13",
+      "runtime_pointer": "$CD/$CE",
+      "tables": 19,
+      "bytes_per_table": 42,
+      "layout": "3 sprite colors + 3 background phases of 13 bytes",
+      "expansion": "BAA0 inserts $0E at background palette slots 4,8,12, producing 16 bytes",
+      "ppu_targets": "sprite tail $3F1D-$3F1F; background $3F00-$3F0F",
+      "phase": "$03CD = 0 for slow counter 00-9F, 1 for A0-C7, 2 for C8-FF",
+      "catalog": "OriginalPaletteCycleCatalog.kt"
+    }
   }
 }
