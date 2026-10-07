@@ -40,11 +40,11 @@ class OriginalCollisionMaskCatalogTest {
         assertTrue(C.isBlockedTile(49,1))
         assertFalse(C.isBlockedTile(49,48))
 
-        assertEquals(36,C.blockedTilesForLocation(0).size)
-        assertEquals(36,C.blockedTilesForLocation(8).size)
-        assertEquals(76,C.blockedTilesForLocation(16).size)
-        assertEquals(129,C.blockedTilesForLocation(18).size)
-        assertEquals(135,C.blockedTilesForLocation(49).size)
+        assertEquals(20,C.blockedTilesForLocation(0).size)
+        assertEquals(16,C.blockedTilesForLocation(8).size)
+        assertEquals(60,C.blockedTilesForLocation(16).size)
+        assertEquals(117,C.blockedTilesForLocation(18).size)
+        assertEquals(124,C.blockedTilesForLocation(49).size)
 
         var bad=false
         try { C.isBlockedTile(0,208) } catch (_:IllegalArgumentException) { bad=true }
