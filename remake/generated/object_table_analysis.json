@@ -281,5 +281,26 @@
       "map mapper-71 bank state before interpreting raw45le/raw78le as CPU pointers"
     ],
     "status": "64-record byte span structurally established; field semantics not yet established"
+  },
+  "deep_batch_4": {
+    "mapper71_mapping_note": "For the 256 KiB PRG image, fixed-bank CPU addresses $C000-$FFFF correspond to the final 16 KiB PRG bank (file PRG offsets 245760..262143). Therefore table PRG offset 259408 maps to CPU $F550; previous $F564 was record index 2, not the table start.",
+    "corrected_cpu_span": {
+      "start": "0xF550",
+      "end_inclusive": "0xF7CF",
+      "bytes": 640
+    },
+    "important_correction": "Earlier analysis treated $F564 as the table base. After restoring the two leading records, the structural base is $F550. $F564 is 20 bytes into the table.",
+    "exhaustive_operand_scan": {
+      "range": "$F550-$F7FF",
+      "candidate_opcode_shaped_hits": 112,
+      "warning": "Most hits are in switchable banks/data and cannot be called executed references without bank/control-flow proof."
+    },
+    "fixed_bank_context": {
+      "table_prg_bank": 15,
+      "bank_size": 16384,
+      "bank_start_prg_offset": 245760,
+      "table_bank_offset": 13648
+    },
+    "next_required_proof": "Disassemble the final fixed bank from known vectors/control-flow roots, then retain only reachable instructions referencing $F550-$F7CF."
   }
 }
