@@ -40,6 +40,18 @@ def transition_table(prg,ptr):
         if threshold==0xFFFF: return rows
     raise AssertionError(f'unterminated transition table {ptr:04X}')
 
+def read_text_stream_en(prg,ptr):
+    out=[]; p=ptr
+    for _ in range(512):
+        b=bb(prg,6,p); p+=1
+        if b==0xFF: break
+        if b==0xFE: out.append("\n")
+        elif 32<=b<=126: out.append(chr(b))
+        else: out.append("\\x%02X"%b)
+    else:
+        raise AssertionError(f'unterminated bank-6 text stream {ptr:04X}')
+    return ''.join(out)
+
 def parse_chr_upload_list(prg,ptr):
     rows=[]; p=ptr; target_half_raw=1; marker_count=0
     for _ in range(64):
@@ -124,6 +136,7 @@ def main():
         text_stream=w16(d,16)
         routine_list=w16(d,18)
         chr_uploads,chr_marker_count=parse_chr_upload_list(prg,chr_upload_list)
+        text_en=read_text_stream_en(prg,text_stream)
         assert 1<=width<=96
         assert 0<=metatile_bank<=14
         assert 0x8000<=metatile_base<=0xBFFF
@@ -165,6 +178,7 @@ def main():
             'chr_upload_marker_count':chr_marker_count,
             'chr_uploads':chr_uploads,
             'text_stream_cpu':text_stream,
+            'text_stream_en':text_en,
             'routine_list_cpu':routine_list,
             'map_stream_bank':2,'map_stream_cpu':map_ptr,'map_rows':6,
             'map_cell_count':len(grid),'used_cell_ids':used,'map_cells':grid,
@@ -186,6 +200,10 @@ def main():
     assert all(0x8000<=x['chr_upload_list_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['text_stream_cpu']<=0xBFFF for x in locations)
     assert all(0x8000<=x['routine_list_cpu']<=0xBFFF for x in locations)
+    assert "HOME SWEET HOME!" in locations[0]['text_stream_en']
+    assert "DYLANS HUT" in locations[1]['text_stream_en']
+    assert "WIZARD ZAKS" in locations[33]['text_stream_en']
+    assert "OCEAN" in locations[49]['text_stream_en']
     assert sum(len(x['chr_uploads']) for x in locations)==304
     assert sum(x['chr_upload_marker_count'] for x in locations)==49
     assert [x['key'] for x in locations if not x['chr_uploads']]==[16]
