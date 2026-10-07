@@ -75,6 +75,10 @@ object OriginalObjectCatalog {
         intArrayOf(19,172,1,64,41833,27,48605,0)
     )
 
+    init {
+        require(rows.size == RECORD_COUNT) { "ROM table row count mismatch: ${rows.size} != $RECORD_COUNT" }
+    }
+
     val all: List<OriginalObject> = rows.map { r ->
         OriginalObject(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7])
     }
