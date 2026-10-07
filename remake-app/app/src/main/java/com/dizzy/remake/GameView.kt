@@ -21,13 +21,36 @@ class GameView(context: Context) : View(context) {
     private val frame = object : Runnable {
         override fun run() {
             if (!running || !isAttachedToWindow) return
-            clock.advance(System.nanoTime()) { engine.tick(); t += 1f / 50f }
+            clock.advance(System.nanoTime()) {
+                engine.tick(); t += 1f / 50f
+                handleRoomTransition()
+            }
             invalidate(); postOnAnimation(this)
         }
     }
 
     override fun onAttachedToWindow() { super.onAttachedToWindow(); running=true; audio.start(); clock.reset(System.nanoTime()); postOnAnimation(frame) }
     override fun onDetachedFromWindow() { running=false; audio.stop(); removeCallbacks(frame); super.onDetachedFromWindow() }
+
+    private fun handleRoomTransition() {
+        if (currentRoom == 0 && world.player.x >= world.room.width - 18f) {
+            currentRoom = 1
+            scene = RemasterScenes.room(1)
+            world.room = scene.room
+            world.player.x = 18f
+            world.player.y = 150f
+            world.player.vx = 0f
+            world.player.vy = 0f
+        } else if (currentRoom == 1 && world.player.x <= 2f) {
+            currentRoom = 0
+            scene = RemasterScenes.room(0)
+            world.room = scene.room
+            world.player.x = world.room.width - 38f
+            world.player.y = 150f
+            world.player.vx = 0f
+            world.player.vy = 0f
+        }
+    }
 
     private fun sx(x:Float)= (x-viewport.x)*(width.toFloat()/viewport.width)
     private fun sy(y:Float)= (y-viewport.y)*(height.toFloat()/viewport.height)
