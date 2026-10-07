@@ -364,5 +364,22 @@
     "cpu_address_if_selected": "0xAA66",
     "status": "candidate only; instruction alignment and reachability not yet proven",
     "next": "trace mapper bank selection and bank 13 entry points"
+  },
+  "bank13_candidate_followup": {
+    "candidate": {
+      "prg_offset": 223846,
+      "bank": 13,
+      "bank_offset": 10854,
+      "cpu_if_selected": "0xAA66",
+      "bytes": "50 F5"
+    },
+    "local_context_assessment": "The pair is embedded in a high-entropy byte region and has not been established as an instruction operand.",
+    "mapper71_plan": [
+      "identify reachable writes to $8000-$FFFF from fixed-bank control flow",
+      "record accumulator values reaching mapper writes where statically resolvable",
+      "derive switchable-bank entry points from JSR/JMP targets in $8000-$BFFF under each selected bank",
+      "trace bank 13 only if selection of bank 13 is proven"
+    ],
+    "safety_rule": "Do not promote the bank-13 F550 pair to a code reference until bank selection, reachability and instruction alignment are all proven."
   }
 }
