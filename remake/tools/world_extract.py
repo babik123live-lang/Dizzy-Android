@@ -102,6 +102,7 @@ def main():
     assert len(set(ptrs))==LOCATION_COUNT
     p50=bb(prg,1,POINTER_TABLE_CPU+100)|(bb(prg,1,POINTER_TABLE_CPU+101)<<8)
     assert not (0x8000<=p50<=0xBFFF)
+    assert bs(prg,0,0x8001,16)==bytes.fromhex('a9008593a9a0859ca900859da9b085a3')
     assert bs(prg,0,0x848F,30).startswith(bytes.fromhex('a593c932'))
     assert bytes.fromhex('a9188593') in bs(prg,0,0x848F,30)
     assert bs(prg,0,0x84AD,8)==bytes.fromhex('a593c933d00320d0')
@@ -240,6 +241,7 @@ def main():
 
     result={
         'rom_sha256':sha,'location_count':50,
+        'initial_state':{'location_key':0,'world_x':160,'world_x_ram':'0x009C-0x009D','raw_a3':176},
         'descriptor_pointer_table':{'bank':1,'cpu':'0x8003','index':'RAM $93 * 2'},
         'world_x_ram':'0x009C-0x009D','screen_x_ram':'0x00A3',
         'normal_transition_edge_count':len(normal_edges),
