@@ -987,5 +987,24 @@
       "Trace FA3B-FB16"
     ],
     "target": "Prove which writer reaches PPU pattern addresses $04F0-$052F and identify its source bytes."
+  },
+  "chr_upload_breakthrough": {
+    "routine": "$DE84",
+    "proven": "Generic CHR-RAM uploader. It stores source pointer X/Y in $2C/$2D, multiplies A by 16, constructs a PPU pattern address, then $DEA6+ streams bytes through $2007.",
+    "important_correction": "For this call form the high-byte accumulator is seeded with 1 before four shifts. Therefore tile N targets PPU $1000 + 16*N, not $0000 + 16*N.",
+    "target_tiles": {
+      "50": "PPU $1500-$150F",
+      "51": "PPU $1510-$151F",
+      "52": "PPU $1520-$152F",
+      "4F": "PPU $14F0-$14FF"
+    },
+    "evidence": [
+      "$DE9F/$DEA2 write computed high/low address to $2006",
+      "$DEC4 writes source bytes to $2007",
+      "16-byte inner count corresponds to one NES 2bpp tile",
+      "$C706 is a real caller of $DE84 in fixed-bank code"
+    ],
+    "consequence": "The previous $04F0-$052F target range was wrong by $1000. The animated OAM tiles live in pattern table 1.",
+    "next": "Trace the $DE84 call that receives tile IDs 4F-52 and recover its X/Y source pointer; then decode the exact 64 source bytes."
   }
 }
