@@ -16,6 +16,7 @@ fun main() {
     check(com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 10)
     check(OriginalObjectCatalog.RECORD_COUNT == 64)
     check(OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 259408)
+    check(OriginalObjectCatalog.TABLE_CPU_ADDRESS == 0xF550)
     check(OriginalObjectCatalog.TABLE_END_EXCLUSIVE_PRG_OFFSET == 260048)
     check(OriginalObjectCatalog.TABLE_END_EXCLUSIVE_PRG_OFFSET - OriginalObjectCatalog.TABLE_START_PRG_OFFSET == 640)
     check(OriginalObjectCatalog.RECORD_COUNT * com.dizzy.remake.core.OriginalObject.BYTE_SIZE == 640)
