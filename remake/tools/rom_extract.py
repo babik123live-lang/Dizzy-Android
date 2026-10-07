@@ -25,7 +25,7 @@ def main():
 
     # Persistent objects are 10-byte records in the original game.  Do not
     # guess their table location: scan for long runs whose area/sub-area bytes
-    # stay inside the verified 0..48 room range, then emit candidates for
+    # fit conservative byte/address constraints, then emit candidates for
     # comparison against the loader/disassembly.
     candidates=[]
     record_size=10
@@ -34,18 +34,18 @@ def main():
         pos=start
         while pos+record_size <= len(prg):
             r=prg[pos:pos+record_size]
-            area, sub=r[0], r[2]
-            if area > 48 or sub > 48:
+            raw0, raw2=r[0], r[2]
+            if raw0 > 255 or raw2 > 48:
                 break
             sprite=r[4] | (r[5]<<8)
             desc=r[7] | (r[8]<<8)
             if sprite < 0x6000 or desc < 0x6000:
                 break
             records.append({
-                "prg_offset":pos, "area_id":area, "x":r[1],
-                "sub_area_id":sub, "y":r[3],
-                "sprite_address":sprite, "interaction_id":r[6],
-                "description_address":desc, "interaction_sub_id":r[9]
+                "prg_offset":pos, "raw0":raw0, "raw1":r[1],
+                "raw2":raw2, "raw3":r[3],
+                "raw45le":sprite, "raw6":r[6],
+                "raw78le":desc, "raw9":r[9]
             })
             pos += record_size
         if len(records) >= 12:
@@ -77,7 +77,7 @@ def main():
     # against the source ROM rather than reconstructed from interpreted fields.
     for c in filtered:
         for r in c["records"]:
-            o=r["offset"]
+            o=r["prg_offset"]
             r["raw_hex"]=prg[o:o+10].hex()
 
     # Add structural evidence without promoting candidates to verified data.
@@ -86,13 +86,13 @@ def main():
     for c in filtered:
         rs=c["records"]
         c["structure"]={
-            "area_ids":sorted(set(r["area_id"] for r in rs)),
-            "sprite_address_min":min(r["sprite_address"] for r in rs),
-            "sprite_address_max":max(r["sprite_address"] for r in rs),
-            "description_address_min":min(r["description_address"] for r in rs),
-            "description_address_max":max(r["description_address"] for r in rs),
-            "all_sprite_addresses_in_cpu_rom_window":all(0x8000 <= r["sprite_address"] <= 0xffff for r in rs),
-            "all_description_addresses_in_cpu_rom_window":all(0x8000 <= r["description_address"] <= 0xffff for r in rs)
+            "raw0_values":sorted(set(r["raw0"] for r in rs)),
+            "raw45le_min":min(r["raw45le"] for r in rs),
+            "raw45le_max":max(r["raw45le"] for r in rs),
+            "raw78le_min":min(r["raw78le"] for r in rs),
+            "raw78le_max":max(r["raw78le"] for r in rs),
+            "all_raw45le_in_cpu_rom_window":all(0x8000 <= r["raw45le"] <= 0xffff for r in rs),
+            "all_raw78le_in_cpu_rom_window":all(0x8000 <= r["raw78le"] <= 0xffff for r in rs)
         }
 
     # Record every raw little-endian occurrence of each candidate start,
