@@ -1404,5 +1404,52 @@
     "runtime_ram": "$91/$92",
     "formula": "newLocalX = oldLocalX + oldOriginX - newOriginX",
     "catalog": "OriginalWorldXOriginCatalog.kt"
+  },
+  "persistent_object_identity_batch": {
+    "object_count": 64,
+    "behavior_dispatch": {
+      "table_cpu": "$8C80",
+      "handler_count": 32,
+      "record_field": "byte 6",
+      "rule": "ASL byte6 then indirect jump through 32-entry pointer table",
+      "most_common": {
+        "0": 18,
+        "1": 8,
+        "2": 3,
+        "3": 5
+      }
+    },
+    "inventory_record": {
+      "record_field": "bytes 7-8",
+      "bank": 9,
+      "reader": "bank-9 $AC6A called after fixed bank selects bank 9",
+      "layout": "first word = bank-3 inventory graphics source; description text begins at +2 and ends with $FF ($FE is line break)",
+      "unique_records": 55,
+      "unique_inventory_graphics": 46
+    },
+    "graphics": {
+      "world": "bytes 4-5 are bank-3 source for four decoded CHR tiles",
+      "world_unique_graphics": 46,
+      "active_slots": 10,
+      "active_tiles": "$D7,$DB,...,$FB",
+      "inventory": "first 3 bytes of inventory graphics record are copied as header; payload begins at +3 and decodes 16 tiles into pattern table 1",
+      "inventory_slots": [
+        "$70",
+        "$80",
+        "$90",
+        "$A0"
+      ]
+    },
+    "behavior_parameter": {
+      "record_field": "byte 9",
+      "status": "behavior-specific parameter",
+      "evidence": "behavior 1 uses values 0..7 as an auxiliary variant index; behavior 3 uses 0..4"
+    },
+    "extractor": "remake/tools/object_extract.py",
+    "catalogs": [
+      "OriginalObjectBehaviorCatalog.kt",
+      "OriginalObjectIdentityCatalog.kt",
+      "OriginalInventoryRenderContract.kt"
+    ]
   }
 }
