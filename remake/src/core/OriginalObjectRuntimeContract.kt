@@ -27,6 +27,7 @@ object OriginalObjectRuntimeContract {
     const val GRAPHICS_TILES_PER_OBJECT = 4
     const val FIRST_GRAPHICS_TILE = 0xD7
     const val GRAPHICS_TILE_LIMIT = 0xFD
+    const val MAX_GRAPHICS_SLOTS = 10
 
     /**
      * Active record layout produced by $895A:
@@ -45,5 +46,5 @@ object OriginalObjectRuntimeContract {
     }
 
     fun canAllocateGraphicsSlot(slot:Int):Boolean =
-        graphicsTileForSlot(slot) < GRAPHICS_TILE_LIMIT
+        slot in 0 until MAX_GRAPHICS_SLOTS && graphicsTileForSlot(slot) < GRAPHICS_TILE_LIMIT
 }
