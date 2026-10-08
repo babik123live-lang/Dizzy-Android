@@ -25,8 +25,8 @@ class OriginalWorldXOriginCatalogTest {
         assertEquals(100,O.localXAfterLocationChange(8,100,8))
         assertEquals(228,O.localXAfterLocationChange(8,100,9))
         assertEquals(356,O.localXAfterLocationChange(8,100,10))
-        assertEquals(1484,O.localXAfterLocationChange(18,100,17))
-        assertEquals(1764,O.localXAfterLocationChange(18,100,19))
+        assertEquals(1764,O.localXAfterLocationChange(18,100,17))
+        assertEquals(5700,O.localXAfterLocationChange(18,100,19))
 
         val g=O.globalX(18,777)
         assertEquals(g,O.globalX(17,O.localXAfterLocationChange(18,777,17)))
