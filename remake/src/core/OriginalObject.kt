@@ -6,8 +6,9 @@ package com.dizzy.remake.core
  * The original bank-0 loader proves bytes 0..5 have these roles:
  * raw0 = runtime location key, raw1/raw2 = little-endian world X,
  * raw3 = sprite Y, raw45le = source pointer for a four-tile CHR upload.
- * raw6 selects one of 32 behavior handlers. Later fields remain raw until
- * every consumer has been traced.
+ * raw6 selects one of 32 behavior handlers. raw78le points to the bank-9
+ * inventory/display record used by the original item screen. raw9 is a
+ * behavior-specific parameter; handlers 1 and 3 use it as a variant index.
  */
 data class OriginalObject(
     val raw0:Int,
@@ -24,6 +25,8 @@ data class OriginalObject(
     val spriteY:Int get() = raw3
     val graphicsSourceCpu:Int get() = raw45le
     val behaviorIndex:Int get() = raw6
+    val inventoryRecordCpu:Int get() = raw78le
+    val behaviorParameter:Int get() = raw9
 
     companion object {
         const val BYTE_SIZE = 10
